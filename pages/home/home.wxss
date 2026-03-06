@@ -1,0 +1,159 @@
+/* pages/home/home.wxss */
+.home-container {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* 授权引导 */
+.auth-guide {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-content {
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 60rpx 40rpx;
+  text-align: center;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.2);
+}
+
+.auth-emoji {
+  display: block;
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+}
+
+.auth-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+.auth-desc {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+}
+
+.auth-tip {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  margin-top: 16rpx;
+}
+
+.auth-skip {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-primary);
+  margin-top: 24rpx;
+  text-decoration: underline;
+}
+
+.btn-large {
+  padding: 28rpx 60rpx;
+  font-size: 32rpx;
+}
+
+.home-header {
+  position: relative;
+  height: 320rpx;
+  overflow: hidden;
+}
+
+.header-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8C42 100%);
+  border-radius: 0 0 60rpx 60rpx;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  padding: 48rpx 32rpx 32rpx;
+}
+
+.greeting {
+  display: block;
+  color: rgba(255,255,255,0.9);
+  font-size: 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.home-actions {
+  margin-top: 32rpx;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 32rpx;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow-card);
+}
+
+.action-icon {
+  font-size: 64rpx;
+  margin-right: 24rpx;
+}
+
+.action-info {
+  flex: 1;
+}
+
+.action-title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.action-desc {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  margin-top: 4rpx;
+}
+
+.action-arrow {
+  font-size: 48rpx;
+  color: var(--color-text-hint);
+  font-weight: 300;
+}
+
+.bind-card {
+  text-align: center;
+  padding: 48rpx 32rpx;
+}
+
+.bind-emoji {
+  display: block;
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.bind-text {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.bind-sub {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  margin-top: 8rpx;
+}

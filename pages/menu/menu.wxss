@@ -1,0 +1,244 @@
+/* pages/menu/menu.wxss */
+.menu-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  position: relative;
+}
+
+.chef-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: var(--color-card);
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.chef-info {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.chef-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+}
+
+.chef-label {
+  display: block;
+  font-size: 20rpx;
+  color: var(--color-text-hint);
+}
+
+.chef-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.chef-no-partner {
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.edit-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 32rpx;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.edit-active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.edit-toolbar {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 24rpx;
+  background: #FFF3E0;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.toolbar-btn {
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
+  background: var(--color-secondary);
+  color: #fff;
+  font-size: 24rpx;
+}
+
+.menu-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* 左栏分类 */
+.category-list {
+  width: 180rpx;
+  background: #FAF0F0;
+  border-right: 1rpx solid var(--color-border);
+}
+
+.category-item {
+  position: relative;
+  padding: 28rpx 16rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  text-align: center;
+  border-bottom: 1rpx solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-active {
+  background: var(--color-card);
+  color: var(--color-primary);
+  font-weight: 700;
+  border-right: 4rpx solid var(--color-primary);
+}
+
+.cat-delete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 右栏菜品 */
+.dish-list {
+  flex: 1;
+  background: var(--color-card);
+  padding: 0 16rpx;
+}
+
+.dish-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.dish-img {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 12rpx;
+  background: var(--color-primary-light);
+  flex-shrink: 0;
+}
+
+.dish-info {
+  flex: 1;
+  padding: 0 16rpx;
+}
+
+.dish-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dish-desc {
+  display: block;
+  font-size: 22rpx;
+  color: var(--color-text-hint);
+  margin-top: 4rpx;
+}
+
+.dish-counter {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.counter-btn {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.minus {
+  background: #FFE5E5;
+  color: var(--color-primary);
+}
+
+.plus {
+  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
+  color: #fff;
+}
+
+.counter-num {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 32rpx;
+  text-align: center;
+}
+
+.dish-edit-btn {
+  padding: 10rpx 20rpx;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: 24rpx;
+  font-size: 24rpx;
+}
+
+/* 购物车 FAB */
+.cart-fab {
+  position: fixed;
+  bottom: 160rpx;
+  right: 32rpx;
+  width: 96rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.5);
+  z-index: 100;
+}
+
+.cart-fab-icon {
+  font-size: 44rpx;
+}
+
+.cart-fab-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  background: #333;
+  color: #fff;
+  border-radius: 50%;
+  width: 36rpx;
+  height: 36rpx;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

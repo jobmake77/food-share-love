@@ -1,0 +1,126 @@
+/* app.wxss - 全局样式 */
+
+/* 颜色变量（通过 CSS 自定义属性模拟） */
+page {
+  --color-primary: #FF6B6B;
+  --color-primary-light: #FFE5E5;
+  --color-secondary: #FF8C42;
+  --color-bg: #FFF8F5;
+  --color-card: #FFFFFF;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-text-hint: #999999;
+  --color-border: #F0E6E6;
+  --color-success: #52C41A;
+  --radius-card: 16rpx;
+  --radius-btn: 48rpx;
+  --shadow-card: 0 4rpx 20rpx rgba(255, 107, 107, 0.1);
+
+  background-color: var(--color-bg);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  color: var(--color-text-primary);
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+/* 通用卡片 */
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
+  color: #FFFFFF;
+  border-radius: var(--radius-btn);
+  padding: 24rpx 0;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  width: 100%;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.35);
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border-radius: var(--radius-btn);
+  padding: 20rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  border: 2rpx solid var(--color-primary);
+  width: 100%;
+}
+
+.btn-ghost::after {
+  border: none;
+}
+
+/* 安全底部 */
+.safe-bottom {
+  height: calc(env(safe-area-inset-bottom) + 32rpx);
+}
+
+/* 页面内边距 */
+.page-padding {
+  padding: 24rpx;
+}
+
+/* 标题 */
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+/* 分隔线 */
+.divider {
+  height: 1rpx;
+  background: var(--color-border);
+  margin: 20rpx 0;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 0;
+  color: var(--color-text-hint);
+  font-size: 28rpx;
+}
+
+.empty-state text {
+  margin-top: 16rpx;
+}
+
+/* 徽标 */
+.badge {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 50%;
+  width: 36rpx;
+  height: 36rpx;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 头像 */
+.avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-primary-light);
+}

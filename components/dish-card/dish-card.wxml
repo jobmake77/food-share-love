@@ -1,0 +1,8 @@
+<!-- components/dish-card/dish-card.wxml -->
+<view class="dish-card">
+  <image class="dish-image" src="{{dish.image || '/assets/default-dish.png'}}" mode="aspectFill"/>
+  <view class="dish-body">
+    <text class="dish-name">{{dish.name}}</text>
+    <text class="dish-desc" wx:if="{{dish.desc}}">{{dish.desc}}</text>
+  </view>
+</view>

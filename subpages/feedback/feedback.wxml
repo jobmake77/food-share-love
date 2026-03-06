@@ -1,0 +1,51 @@
+<!-- subpages/feedback/feedback.wxml -->
+<view class="feedback-container">
+  <view class="feedback-header">
+    <text class="header-icon">💬</text>
+    <text class="header-title">意见反馈</text>
+    <text class="header-subtitle">您的建议是我们前进的动力</text>
+  </view>
+
+  <view class="feedback-form">
+    <view class="form-section">
+      <text class="form-label">反馈内容 <text class="required">*</text></text>
+      <textarea
+        class="feedback-textarea"
+        placeholder="请详细描述您遇到的问题或建议&#10;&#10;例如：&#10;- 功能建议&#10;- 使用问题&#10;- 界面优化&#10;- 其他意见"
+        value="{{content}}"
+        bindinput="onContentInput"
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+        auto-height
+      />
+      <text class="char-count">{{content.length}}/500</text>
+    </view>
+
+    <view class="form-section">
+      <text class="form-label">联系方式（选填）</text>
+      <input
+        class="feedback-input"
+        placeholder="微信号/手机号/邮箱（方便我们回复您）"
+        value="{{contact}}"
+        bindinput="onContactInput"
+        maxlength="50"
+      />
+    </view>
+
+    <button
+      class="submit-btn"
+      bindtap="submitFeedback"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+    >
+      {{submitting ? '提交中...' : '提交反馈'}}
+    </button>
+
+    <view class="tips">
+      <text class="tips-title">💡 温馨提示</text>
+      <text class="tips-item">• 我们会认真阅读每一条反馈</text>
+      <text class="tips-item">• 留下联系方式可以获得回复</text>
+      <text class="tips-item">• 您的反馈将帮助我们改进产品</text>
+    </view>
+  </view>
+</view>

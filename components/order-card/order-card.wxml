@@ -1,0 +1,39 @@
+<!-- components/order-card/order-card.wxml -->
+<view class="order-card card">
+  <!-- 头部：头像 + 昵称 + 角色 + 状态 -->\n  <view class="card-header">
+    <image class="creator-avatar" src="{{order.creatorAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
+    <view class="creator-info">
+      <view class="creator-name-row">
+        <text class="creator-name">{{order.creatorName || '点单人'}}</text>
+        <text class="creator-role">{{isMyOrder ? '点菜' : '做饭'}}</text>
+      </view>
+      <text class="order-date">{{order.dateStr}}</text>
+    </view>
+    <view class="order-status {{order.status === 'done' ? 'status-done' : 'status-pending'}}">
+      {{order.status === 'done' ? '已完成' : '待处理'}}
+    </view>
+  </view>
+
+  <!-- 菜品列表 -->
+  <view class="dishes-list">
+    <view class="dish-row" wx:for="{{order.dishes}}" wx:key="dishId">
+      <text class="dish-row-name">{{item.name}}</text>
+      <text class="dish-row-count">×{{item.count}}</text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <text class="order-note" wx:if="{{order.note}}">备注：{{order.note}}</text>
+
+  <!-- 底部按钮 -->
+  <view class="card-footer" wx:if="{{order.status === 'pending'}}">
+    <!-- 待处理状态：任何人都可以点击完成 -->
+    <view class="footer-btn complete-btn" bindtap="onComplete">✓ 完成</view>
+  </view>
+  <view class="card-footer" wx:else>
+    <!-- 订单完成后，下单者可以评价 -->
+    <view class="footer-btn review-btn" bindtap="onReview" wx:if="{{isMyOrder}}">💬 写评价</view>
+    <!-- 厨师看到的是已完成状态 -->
+    <view class="footer-btn complete-btn disabled" wx:else>✓ 已完成</view>
+  </view>
+</view>

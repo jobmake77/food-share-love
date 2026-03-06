@@ -1,0 +1,119 @@
+/* subpages/edit-dish/edit-dish.wxss */
+.edit-container {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.image-upload {
+  position: relative;
+  height: 400rpx;
+  background: var(--color-primary-light);
+  overflow: hidden;
+}
+
+.dish-image {
+  width: 100%;
+  height: 100%;
+}
+
+.upload-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.upload-icon {
+  font-size: 80rpx;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: var(--color-text-hint);
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.4);
+  padding: 16rpx;
+  text-align: center;
+}
+
+.change-photo {
+  color: #fff;
+  font-size: 26rpx;
+}
+
+.form-card {
+  margin: 20rpx 24rpx 0;
+}
+
+.form-item {
+  padding: 16rpx 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 72rpx;
+  font-size: 30rpx;
+  color: var(--color-text-primary);
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 100rpx;
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.form-divider {
+  height: 1rpx;
+  background: var(--color-border);
+  margin: 0 -24rpx;
+}
+
+.picker-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30rpx;
+  color: var(--color-text-primary);
+  height: 72rpx;
+}
+
+.picker-arrow {
+  font-size: 36rpx;
+  color: var(--color-text-hint);
+}
+
+.action-btns {
+  margin-top: 32rpx;
+}
+
+.btn-danger {
+  background: #FFF0F0;
+  color: #FF3B30;
+  border-radius: var(--radius-btn);
+  padding: 24rpx 0;
+  text-align: center;
+  font-size: 30rpx;
+  border: none;
+  width: 100%;
+}
+
+.btn-danger::after {
+  border: none;
+}

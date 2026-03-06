@@ -1,0 +1,70 @@
+<!-- pages/home/home.wxml -->
+<view class="home-container">
+  <!-- 授权引导（首次进入时显示） -->
+  <view class="auth-guide" wx:if="{{needAuth && loaded}}">
+    <view class="auth-content">
+      <text class="auth-emoji">👋</text>
+      <text class="auth-title">欢迎来到食物分享爱</text>
+      <text class="auth-desc">获取你的微信昵称和头像，开启美食之旅</text>
+      <button
+        class="btn-primary btn-large"
+        bindtap="handleAuth"
+        disabled="{{authLoading}}"
+        loading="{{authLoading}}"
+      >
+        {{authLoading ? '登录中...' : '微信授权登录'}}
+      </button>
+      <text class="auth-skip" bindtap="skipAuth">暂时跳过</text>
+      <text class="auth-tip">登录后即可获取你的专属识别码</text>
+    </view>
+  </view>
+
+  <!-- 主界面（授权后显示） -->
+  <view wx:else>
+    <!-- 顶部情侣展示 -->
+    <view class="home-header">
+      <view class="header-bg"></view>
+      <view class="header-content">
+        <text class="greeting">{{greeting}}</text>
+        <avatar-pair
+          my-avatar="{{userInfo.avatar}}"
+          my-name="{{userInfo.nickname}}"
+          partner-avatar="{{partnerInfo.avatar}}"
+          partner-name="{{partnerInfo.nickname}}"
+          has-partner="{{!!partnerInfo}}"
+        />
+      </view>
+    </view>
+
+    <!-- 主功能入口 -->
+    <view class="home-actions page-padding">
+      <view class="action-card order-card" bindtap="goOrder">
+        <view class="action-icon">🍜</view>
+        <view class="action-info">
+          <text class="action-title">我要点单</text>
+          <text class="action-desc">馋了？点单给 TA</text>
+        </view>
+        <view class="action-arrow">›</view>
+      </view>
+
+      <view class="action-card wash-card" bindtap="goGame">
+        <view class="action-icon">🎮</view>
+        <view class="action-info">
+          <text class="action-title">决定洗碗</text>
+          <text class="action-desc">游戏见真章</text>
+        </view>
+        <view class="action-arrow">›</view>
+      </view>
+    </view>
+
+    <!-- 无伙伴时提示绑定 -->
+    <view class="bind-tip page-padding" wx:if="{{!partnerInfo && loaded}}">
+      <view class="bind-card card">
+        <text class="bind-emoji">💑</text>
+        <text class="bind-text">还没有绑定另一半哦</text>
+        <text class="bind-sub">去个人页输入对方识别码来绑定</text>
+        <button class="btn-primary" bindtap="goProfile" style="margin-top: 24rpx;">去绑定</button>
+      </view>
+    </view>
+  </view>
+</view>

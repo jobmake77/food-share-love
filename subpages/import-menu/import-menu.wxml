@@ -1,0 +1,55 @@
+<!--subpages/import-menu/import-menu.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">导入菜单</text>
+    <text class="subtitle">粘贴导出的 JSON 数据</text>
+  </view>
+
+  <view class="input-section">
+    <textarea
+      class="json-input"
+      placeholder="{{placeholder}}"
+      value="{{jsonText}}"
+      bindinput="onJsonInput"
+      maxlength="-1"
+      auto-height
+    />
+
+    <view class="char-count" wx:if="{{jsonText}}">
+      已输入 {{jsonText.length}} 个字符
+    </view>
+  </view>
+
+  <view class="tips">
+    <view class="tip-item">
+      <text class="tip-icon">💡</text>
+      <text class="tip-text">从"导出菜单"功能复制 JSON 数据</text>
+    </view>
+    <view class="tip-item">
+      <text class="tip-icon">📋</text>
+      <text class="tip-text">粘贴到上方文本框中</text>
+    </view>
+    <view class="tip-item">
+      <text class="tip-icon">✅</text>
+      <text class="tip-text">点击导入按钮完成</text>
+    </view>
+  </view>
+
+  <view class="button-group">
+    <button
+      class="btn-secondary"
+      bindtap="clearJson"
+      disabled="{{!jsonText || importing}}"
+    >
+      清空
+    </button>
+    <button
+      class="btn-primary"
+      bindtap="importMenu"
+      loading="{{importing}}"
+      disabled="{{!jsonText || importing}}"
+    >
+      {{importing ? '导入中...' : '导入菜单'}}
+    </button>
+  </view>
+</view>

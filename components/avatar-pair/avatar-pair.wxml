@@ -1,0 +1,27 @@
+<!-- components/avatar-pair/avatar-pair.wxml -->
+<view class="avatar-pair">
+  <!-- 我的头像 -->
+  <view class="avatar-item">
+    <image class="avatar-img" src="{{myAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
+    <text class="avatar-name">{{myName || '我'}}</text>
+  </view>
+
+  <!-- 连接爱心 -->
+  <view class="heart-connector">
+    <text class="heart-icon">{{hasPartner ? '❤️' : '💔'}}</text>
+  </view>
+
+  <!-- 伙伴头像 -->
+  <view class="avatar-item" wx:if="{{hasPartner}}">
+    <image class="avatar-img" src="{{partnerAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
+    <text class="avatar-name">{{partnerName || 'TA'}}</text>
+  </view>
+
+  <!-- 无伙伴占位 -->
+  <view class="avatar-item avatar-empty" wx:else>
+    <view class="avatar-placeholder">
+      <text>?</text>
+    </view>
+    <text class="avatar-name">未绑定</text>
+  </view>
+</view>

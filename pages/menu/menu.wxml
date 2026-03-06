@@ -1,0 +1,76 @@
+<!-- pages/menu/menu.wxml -->
+<view class="menu-container">
+  <!-- 顶部厨师信息 -->
+  <view class="chef-header">
+    <view class="chef-info" wx:if="{{partnerInfo}}">
+      <image class="chef-avatar" src="{{partnerInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
+      <view>
+        <text class="chef-label">今日厨师</text>
+        <text class="chef-name">{{partnerInfo.nickname}}</text>
+      </view>
+    </view>
+    <view class="chef-info" wx:else>
+      <text class="chef-no-partner">还没有绑定厨师哦</text>
+    </view>
+    <!-- 右上角编辑按钮 -->
+    <view class="edit-btn {{editMode ? 'edit-active' : ''}}" bindtap="toggleEditMode">
+      <text>{{editMode ? '完成' : '管理'}}</text>
+    </view>
+  </view>
+
+  <!-- 管理模式工具栏 -->
+  <view class="edit-toolbar" wx:if="{{editMode}}">
+    <view class="toolbar-btn" bindtap="addCategory">+ 新增分类</view>
+    <view class="toolbar-btn" bindtap="goAddDish">+ 新增菜品</view>
+  </view>
+
+  <!-- 菜单主体：左栏分类 + 右栏菜品 -->
+  <view class="menu-body">
+    <!-- 左栏：分类列表 -->
+    <scroll-view class="category-list" scroll-y>
+      <view
+        class="category-item {{activeCategoryIndex === index ? 'category-active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="_id"
+        bindtap="switchCategory"
+        data-index="{{index}}"
+      >
+        <text>{{item.name}}</text>
+        <view class="cat-delete" wx:if="{{editMode}}" catchtap="deleteCategory" data-id="{{item._id}}">×</view>
+      </view>
+    </scroll-view>
+
+    <!-- 右栏：菜品列表 -->
+    <scroll-view class="dish-list" scroll-y id="dishScroll">
+      <view wx:if="{{dishes.length === 0}}" class="empty-state">
+        <text>该分类暂无菜品</text>
+        <text wx:if="{{editMode}}" style="color: var(--color-primary);" bindtap="goAddDish">点击新增</text>
+      </view>
+      <view
+        class="dish-item"
+        wx:for="{{dishes}}"
+        wx:key="_id"
+      >
+        <image class="dish-img" src="{{item.image || '/assets/default-dish.png'}}" mode="aspectFill"/>
+        <view class="dish-info">
+          <text class="dish-name">{{item.name}}</text>
+          <text class="dish-desc">{{item.desc}}</text>
+        </view>
+        <!-- 编辑模式：编辑按钮 -->
+        <view class="dish-edit-btn" wx:if="{{editMode}}" bindtap="editDish" data-dish="{{item}}">编辑</view>
+        <!-- 正常模式：数量控制 -->
+        <view class="dish-counter" wx:else>
+          <view class="counter-btn minus" bindtap="decreaseCount" data-id="{{item._id}}" wx:if="{{cartMap[item._id] > 0}}">-</view>
+          <text class="counter-num" wx:if="{{cartMap[item._id] > 0}}">{{cartMap[item._id]}}</text>
+          <view class="counter-btn plus" bindtap="increaseCount" data-id="{{item._id}}" data-dish="{{item}}">+</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 购物车悬浮按钮 -->
+  <view class="cart-fab" wx:if="{{cartCount > 0}}" bindtap="goCart">
+    <text class="cart-fab-icon">🛒</text>
+    <view class="cart-fab-badge">{{cartCount}}</view>
+  </view>
+</view>

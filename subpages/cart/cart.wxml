@@ -1,0 +1,49 @@
+<!-- subpages/cart/cart.wxml -->
+<view class="cart-container">
+  <!-- 已选菜品 -->
+  <view class="cart-list page-padding">
+    <text class="section-title">已选菜品</text>
+
+    <view wx:if="{{cart.length === 0}}" class="empty-state">
+      <text style="font-size: 80rpx;">🛒</text>
+      <text>购物车是空的</text>
+    </view>
+
+    <view class="cart-item card" wx:for="{{cart}}" wx:key="dishId">
+      <image class="cart-img" src="{{item.image || '/assets/default-dish.png'}}" mode="aspectFill"/>
+      <view class="cart-info">
+        <text class="cart-name">{{item.name}}</text>
+      </view>
+      <view class="cart-counter">
+        <view class="counter-btn minus" bindtap="decrease" data-id="{{item.dishId}}">-</view>
+        <text class="counter-num">{{item.count}}</text>
+        <view class="counter-btn plus" bindtap="increase" data-id="{{item.dishId}}">+</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="note-section page-padding">
+    <text class="section-title">备注</text>
+    <view class="note-card card">
+      <textarea
+        class="note-input"
+        placeholder="有什么想说的就写在这里..."
+        value="{{note}}"
+        bindinput="onNoteInput"
+        maxlength="200"
+        auto-height
+      />
+    </view>
+  </view>
+
+  <!-- 底部下单按钮 -->
+  <view class="cart-footer">
+    <view class="footer-summary">
+      <text class="total-count">共 {{totalCount}} 道菜</text>
+    </view>
+    <button class="submit-btn" bindtap="placeOrder" loading="{{placing}}" disabled="{{cart.length === 0}}">
+      确认下单
+    </button>
+  </view>
+</view>

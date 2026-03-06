@@ -1,0 +1,83 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/menu/menu",
+    "pages/diary/diary",
+    "pages/order/order",
+    "pages/profile/profile"
+  ],
+  "subPackages": [
+    {
+      "root": "subpages",
+      "pages": [
+        "game/game",
+        "edit-dish/edit-dish",
+        "cart/cart",
+        "order-success/order-success",
+        "import-sample/import-sample",
+        "import-menu/import-menu",
+        "feedback/feedback"
+      ]
+    }
+  ],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B6B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/icons/home.png",
+        "selectedIconPath": "assets/icons/home.png"
+      },
+      {
+        "pagePath": "pages/menu/menu",
+        "text": "菜单",
+        "iconPath": "assets/icons/menu.png",
+        "selectedIconPath": "assets/icons/menu.png"
+      },
+      {
+        "pagePath": "pages/diary/diary",
+        "text": "日记",
+        "iconPath": "assets/icons/diary.png",
+        "selectedIconPath": "assets/icons/diary.png"
+      },
+      {
+        "pagePath": "pages/order/order",
+        "text": "订单",
+        "iconPath": "assets/icons/order.png",
+        "selectedIconPath": "assets/icons/order.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/icons/profile.png",
+        "selectedIconPath": "assets/icons/profile.png"
+      }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF6B6B",
+    "navigationBarTitleText": "食分爱",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FFF8F5",
+    "enablePullDownRefresh": false,
+    "onReachBottomDistance": 50
+  },
+  "usingComponents": {},
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "preloadRule": {
+    "pages/home/home": {
+      "network": "all",
+      "packages": ["subpages"]
+    },
+    "pages/menu/menu": {
+      "network": "all",
+      "packages": ["subpages"]
+    }
+  }
+}

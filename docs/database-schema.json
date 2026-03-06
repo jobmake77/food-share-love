@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "read": "doc.targetId == auth.openid || doc.fromId == auth.openid",
+    "write": "doc.fromId == auth.openid",
+    "create": true,
+    "update": false,
+    "delete": "doc.targetId == auth.openid || doc.fromId == auth.openid"
+  }
+}

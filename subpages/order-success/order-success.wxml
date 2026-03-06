@@ -1,0 +1,32 @@
+<!-- subpages/order-success/order-success.wxml -->
+<view class="success-container">
+  <!-- 成功动画区 -->
+  <view class="success-top">
+    <view class="success-circle">
+      <text class="success-emoji">✅</text>
+    </view>
+    <text class="success-title">下单成功！</text>
+    <text class="success-sub">已通知厨师开始准备啦~</text>
+  </view>
+
+  <!-- 订单概要 -->
+  <view class="order-summary card page-padding">
+    <text class="summary-title">本次订单</text>
+    <view class="summary-dishes">
+      <view class="summary-dish" wx:for="{{dishes}}" wx:key="dishId">
+        <text class="summary-dish-name">{{item.name}}</text>
+        <text class="summary-dish-count">x{{item.count}}</text>
+      </view>
+    </view>
+    <view class="summary-note" wx:if="{{note}}">
+      <text class="note-label">备注</text>
+      <text class="note-content">{{note}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-btns page-padding">
+    <button class="btn-primary" bindtap="goOrders" style="margin-bottom: 16rpx;">查看订单</button>
+    <button class="btn-ghost" bindtap="goHome">返回首页</button>
+  </view>
+</view>

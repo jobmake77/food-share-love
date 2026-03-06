@@ -1,0 +1,33 @@
+/* pages/order/order.wxss */
+.order-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+.filter-bar {
+  display: flex;
+  background: var(--color-card);
+  padding: 0 24rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.filter-item {
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  border-bottom: 4rpx solid transparent;
+  margin-bottom: -1rpx;
+}
+
+.filter-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 700;
+}
+
+.order-list {
+  flex: 1;
+  padding: 20rpx;
+}

@@ -1,0 +1,101 @@
+<!-- pages/diary/diary.wxml -->
+<view class="diary-container">
+  <!-- 日历头部 -->
+  <view class="calendar-header">
+    <view class="header-content">
+      <text class="cal-title">{{calMode === 'week' ? weekTitle : monthTitle}}</text>
+      <text class="cal-subtitle">饮食日记</text>
+    </view>
+    <view class="header-actions">
+      <view class="cal-nav" bindtap="prevPeriod">
+        <text class="nav-icon">‹</text>
+      </view>
+      <view class="cal-mode-toggle" bindtap="toggleCalMode">
+        <text class="toggle-text">{{calMode === 'week' ? '周' : '月'}}</text>
+      </view>
+      <view class="cal-nav" bindtap="nextPeriod">
+        <text class="nav-icon">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 周历 / 月历 -->
+  <view class="calendar-body">
+    <!-- 星期行 -->
+    <view class="weekday-row">
+      <view class="weekday" wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <!-- 日期格子 -->
+    <view class="dates-grid">
+      <view
+        class="date-cell {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isEmpty ? 'empty-cell' : ''}} {{item.hasOrder ? 'has-order' : ''}}"
+        wx:for="{{calDates}}"
+        wx:key="dateStr"
+        bindtap="selectDate"
+        data-date="{{item.dateStr}}"
+      >
+        <text class="date-num">{{item.day}}</text>
+        <view class="order-indicator" wx:if="{{item.hasOrder}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选中日期的订单 -->
+  <view class="day-orders">
+    <view class="section-header">
+      <text class="section-title">{{selectedDateLabel}}</text>
+      <text class="section-count" wx:if="{{dayOrders.length > 0}}">{{dayOrders.length}}条记录</text>
+    </view>
+
+    <view wx:if="{{dayOrders.length === 0}}" class="empty-state">
+      <text class="empty-icon">🍽️</text>
+      <text class="empty-text">这天还没有饮食记录</text>
+    </view>
+
+    <!-- 日记卡片 -->
+    <view class="diary-card" wx:for="{{dayOrders}}" wx:key="_id">
+      <!-- 头部：头像 + 昵称 + 时间 -->
+      <view class="diary-header">
+        <image class="diary-avatar" src="{{item.creatorAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
+        <view class="diary-info">
+          <text class="diary-name">{{item.creatorName}}</text>
+          <text class="diary-time">{{item.timeStr}}</text>
+        </view>
+      </view>
+
+      <!-- 菜品图片横向滚动 -->
+      <view class="dish-images-container" wx:if="{{item.dishes.length > 0}}">
+        <scroll-view
+          class="dish-images-scroll {{item.expanded ? 'expanded' : ''}}"
+          scroll-x="{{item.expanded}}"
+          enable-flex
+        >
+          <view class="dish-images-wrapper">
+            <image
+              class="dish-image"
+              wx:for="{{item.dishes}}"
+              wx:key="dishId"
+              wx:for-item="dish"
+              src="{{dish.image || '/assets/default-dish.png'}}"
+              mode="aspectFill"
+            />
+          </view>
+        </scroll-view>
+
+        <!-- 展开按钮 -->
+        <view
+          class="expand-btn"
+          wx:if="{{item.dishes.length > 4 && !item.expanded}}"
+          bindtap="toggleExpand"
+          data-order-id="{{item._id}}"
+        >
+          <text class="expand-icon">›</text>
+        </view>
+      </view>
+
+      <!-- 备注 -->
+      <text class="diary-note" wx:if="{{item.note}}">{{item.note}}</text>
+    </view>
+  </view>
+</view>

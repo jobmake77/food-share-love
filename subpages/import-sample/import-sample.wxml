@@ -1,0 +1,46 @@
+<!--subpages/import-sample/import-sample.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="icon">📋</text>
+    <text class="title">导入示例菜单</text>
+    <text class="subtitle">快速开始使用小程序</text>
+  </view>
+
+  <view class="stats">
+    <view class="stat-item">
+      <text class="stat-number">{{stats.categories}}</text>
+      <text class="stat-label">个分类</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-number">{{stats.dishes}}</text>
+      <text class="stat-label">道菜品</text>
+    </view>
+  </view>
+
+  <view class="preview">
+    <view class="preview-title">包含内容</view>
+    <view class="preview-list">
+      <view class="preview-item">🍚 主食：米饭、炒饭、面条</view>
+      <view class="preview-item">🍖 荤菜：红烧肉、糖醋排骨、宫保鸡丁等</view>
+      <view class="preview-item">🥬 素菜：番茄炒蛋、麻婆豆腐、地三鲜等</view>
+      <view class="preview-item">🍲 汤品：西红柿蛋汤、紫菜蛋花汤等</view>
+      <view class="preview-item">🍰 甜品：水果拼盘、红豆沙、冰淇淋</view>
+    </view>
+  </view>
+
+  <view class="tips">
+    <text class="tips-icon">💡</text>
+    <text class="tips-text">导入后可以在菜单管理中编辑或删除</text>
+  </view>
+
+  <button
+    class="import-btn"
+    type="primary"
+    bindtap="importSample"
+    loading="{{importing}}"
+    disabled="{{importing}}"
+  >
+    {{importing ? '导入中...' : '一键导入'}}
+  </button>
+</view>

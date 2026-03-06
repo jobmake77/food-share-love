@@ -1,0 +1,140 @@
+{
+  "categories": [
+    {
+      "name": "主食",
+      "icon": "🍚",
+      "sort": 1
+    },
+    {
+      "name": "荤菜",
+      "icon": "🍖",
+      "sort": 2
+    },
+    {
+      "name": "素菜",
+      "icon": "🥬",
+      "sort": 3
+    },
+    {
+      "name": "汤品",
+      "icon": "🍲",
+      "sort": 4
+    },
+    {
+      "name": "甜品",
+      "icon": "🍰",
+      "sort": 5
+    }
+  ],
+  "dishes": [
+    {
+      "name": "米饭",
+      "categoryName": "主食",
+      "description": "香喷喷的白米饭",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "炒饭",
+      "categoryName": "主食",
+      "description": "蛋炒饭，粒粒分明",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "面条",
+      "categoryName": "主食",
+      "description": "劲道爽滑的面条",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "红烧肉",
+      "categoryName": "荤菜",
+      "description": "肥而不腻，入口即化",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "糖醋排骨",
+      "categoryName": "荤菜",
+      "description": "酸甜可口，外酥里嫩",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "宫保鸡丁",
+      "categoryName": "荤菜",
+      "description": "麻辣鲜香，鸡肉嫩滑",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "鱼香肉丝",
+      "categoryName": "荤菜",
+      "description": "酸甜微辣，下饭神器",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "水煮鱼",
+      "categoryName": "荤菜",
+      "description": "麻辣鲜香，鱼肉滑嫩",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "番茄炒蛋",
+      "categoryName": "素菜",
+      "description": "酸甜开胃，家常必备",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "清炒时蔬",
+      "categoryName": "素菜",
+      "description": "清淡爽口，健康营养",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "麻婆豆腐",
+      "categoryName": "素菜",
+      "description": "麻辣鲜香，豆腐嫩滑",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "地三鲜",
+      "categoryName": "素菜",
+      "description": "茄子土豆青椒，东北名菜",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "西红柿蛋汤",
+      "categoryName": "汤品",
+      "description": "酸甜开胃，营养丰富",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "紫菜蛋花汤",
+      "categoryName": "汤品",
+      "description": "清淡鲜美，简单快手",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "排骨汤",
+      "categoryName": "汤品",
+      "description": "浓郁鲜香，营养滋补",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "水果拼盘",
+      "categoryName": "甜品",
+      "description": "新鲜水果，健康美味",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "红豆沙",
+      "categoryName": "甜品",
+      "description": "香甜软糯，暖心暖胃",
+      "image": "/assets/default-dish.png"
+    },
+    {
+      "name": "冰淇淋",
+      "categoryName": "甜品",
+      "description": "清凉解暑，甜蜜享受",
+      "image": "/assets/default-dish.png"
+    }
+  ],
+  "exportedAt": "2026-03-05T08:36:00Z"
+}

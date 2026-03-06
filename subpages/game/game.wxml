@@ -1,0 +1,163 @@
+<!-- subpages/game/game.wxml -->
+<view class="game-container">
+  <!-- 游戏选择 -->
+  <view class="game-select" wx:if="{{phase === 'select'}}">
+    <text class="game-title">决定谁来洗碗</text>
+    <text class="game-subtitle">选择你们的决胜方式</text>
+
+    <view class="game-options">
+      <view class="game-option" bindtap="selectGame" data-game="tap">
+        <text class="option-icon">👆</text>
+        <text class="option-name">疯狂点点点</text>
+        <text class="option-desc">5秒拼手速，最解压</text>
+      </view>
+      <view class="game-option" bindtap="selectGame" data-game="dice">
+        <text class="option-icon">🎲</text>
+        <text class="option-name">掷骰子</text>
+        <text class="option-desc">数字大的赢</text>
+      </view>
+      <view class="game-option" bindtap="selectGame" data-game="rps">
+        <text class="option-icon">✂️</text>
+        <text class="option-name">剪刀石头布</text>
+        <text class="option-desc">经典永不过时</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 疯狂点点点 -->
+  <view class="tap-game" wx:if="{{phase === 'tap'}}">
+    <!-- 固定倒计时显示区域 -->
+    <view class="tap-timer-fixed">
+      <text class="game-title">疯狂点点点</text>
+      <!-- 准备倒计时 -->
+      <text class="tap-countdown" wx:if="{{tapCountdown > 0}}">{{tapCountdown}}</text>
+      <!-- 游戏倒计时 -->
+      <text class="tap-countdown game-timer" wx:if="{{tapStarted && gameCountdown > 0}}">{{gameCountdown}}秒</text>
+    </view>
+
+    <view class="tap-battle-area">
+      <!-- 玩家1区域（上半部分，红色） -->
+      <view
+        class="tap-zone tap-zone-red"
+        style="height: {{player1Height}}%;"
+        catchtap="tapPlayer1"
+      >
+        <view class="tap-zone-content">
+          <text class="tap-player-name">🔴 你点这里</text>
+          <text class="tap-score">{{player1Taps}}</text>
+        </view>
+      </view>
+
+      <!-- 玩家2区域（下半部分，蓝色） -->
+      <view
+        class="tap-zone tap-zone-blue"
+        style="height: {{player2Height}}%;"
+        catchtap="tapPlayer2"
+      >
+        <view class="tap-zone-content">
+          <text class="tap-score">{{player2Taps}}</text>
+          <text class="tap-player-name">🔵 TA点这里</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 开始按钮 -->
+    <view class="tap-start" wx:if="{{!tapStarted && tapCountdown === 0}}">
+      <button class="btn-primary btn-large" bindtap="startTapGame">开始对战</button>
+    </view>
+  </view>
+
+  <!-- 骰子游戏 -->
+  <view class="dice-game" wx:if="{{phase === 'dice'}}">
+    <text class="game-title">掷骰子</text>
+    <text class="game-subtitle">点击按钮，一次掷出两个骰子</text>
+    <view class="dice-area">
+      <view class="player-dice">
+        <text class="player-label">我</text>
+        <view class="dice {{rolling ? 'rolling' : ''}}" wx:if="{{myDice === 0}}">
+          <text>?</text>
+        </view>
+        <view class="dice result-dice" wx:else>
+          <text class="dice-num">{{myDice}}</text>
+        </view>
+      </view>
+
+      <text class="vs-text">VS</text>
+
+      <view class="player-dice">
+        <text class="player-label">TA</text>
+        <view class="dice {{rolling ? 'rolling' : ''}}" wx:if="{{partnerDice === 0}}">
+          <text>?</text>
+        </view>
+        <view class="dice result-dice" wx:else>
+          <text class="dice-num">{{partnerDice}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="dice-action">
+      <button class="btn-primary btn-large" bindtap="rollDice" disabled="{{rolling}}">{{rolling ? '掷骰中...' : '掷骰子'}}</button>
+    </view>
+  </view>
+
+  <!-- 剪刀石头布 -->
+  <view class="rps-game" wx:if="{{phase === 'rps'}}">
+    <text class="game-title">剪刀石头布</text>
+    <text class="game-subtitle" wx:if="{{!myRps}}">选择你的出招</text>
+    <text class="game-subtitle" wx:else>系统正在出招...</text>
+
+    <view class="rps-options" wx:if="{{!myRps}}">
+      <view
+        class="rps-btn"
+        bindtap="chooseRps"
+        data-choice="rock"
+      >
+        <text class="rps-icon">✊</text>
+        <text class="rps-name">石头</text>
+      </view>
+      <view
+        class="rps-btn"
+        bindtap="chooseRps"
+        data-choice="scissors"
+      >
+        <text class="rps-icon">✌️</text>
+        <text class="rps-name">剪刀</text>
+      </view>
+      <view
+        class="rps-btn"
+        bindtap="chooseRps"
+        data-choice="paper"
+      >
+        <text class="rps-icon">🖐️</text>
+        <text class="rps-name">布</text>
+      </view>
+    </view>
+
+    <view class="rps-battle" wx:if="{{myRps && partnerRps}}">
+      <view class="rps-vs">
+        <view class="rps-player">
+          <text class="rps-icon-lg">{{rpsEmoji[myRps]}}</text>
+          <text class="rps-label">你</text>
+        </view>
+        <text class="vs-text">VS</text>
+        <view class="rps-player">
+          <text class="rps-icon-lg">{{rpsEmoji[partnerRps]}}</text>
+          <text class="rps-label">TA</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 结果页 -->
+  <view class="result-page" wx:if="{{phase === 'result'}}">
+    <view class="result-animation">
+      <text class="result-emoji">{{resultEmoji}}</text>
+    </view>
+    <text class="result-text">{{resultText}}</text>
+    <text class="result-sub">{{resultSub}}</text>
+    <view class="result-btns">
+      <button class="btn-ghost" bindtap="playAgain" style="margin-bottom: 16rpx;">再来一局</button>
+      <button class="btn-primary" bindtap="goHome">返回首页</button>
+    </view>
+  </view>
+</view>

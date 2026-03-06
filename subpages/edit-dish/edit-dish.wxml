@@ -1,0 +1,72 @@
+<!-- subpages/edit-dish/edit-dish.wxml -->
+<view class="edit-container">
+  <!-- 图片上传 -->
+  <view class="image-upload" bindtap="chooseImage">
+    <image wx:if="{{dish.image}}" class="dish-image" src="{{dish.image}}" mode="aspectFill"/>
+    <view class="upload-placeholder" wx:else>
+      <text class="upload-icon">📷</text>
+      <text class="upload-text">点击上传菜品图片</text>
+    </view>
+    <view class="image-overlay" wx:if="{{dish.image}}">
+      <text class="change-photo">更换图片</text>
+    </view>
+  </view>
+
+  <!-- 表单 -->
+  <view class="form-card card page-padding">
+    <view class="form-item">
+      <text class="form-label">菜品名称 *</text>
+      <input
+        class="form-input"
+        placeholder="如：红烧肉、清炒时蔬..."
+        value="{{dish.name}}"
+        bindinput="onNameInput"
+        maxlength="20"
+      />
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-item">
+      <text class="form-label">简介</text>
+      <textarea
+        class="form-textarea"
+        placeholder="描述一下这道菜..."
+        value="{{dish.desc}}"
+        bindinput="onDescInput"
+        maxlength="100"
+        auto-height
+      />
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-item">
+      <text class="form-label">所属分类</text>
+      <picker
+        mode="selector"
+        range="{{categories}}"
+        range-key="name"
+        value="{{categoryIndex}}"
+        bindchange="onCategoryChange"
+      >
+        <view class="picker-value">
+          <text>{{categories[categoryIndex].name || '请选择分类'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-btns page-padding">
+    <button class="btn-primary" bindtap="saveDish" loading="{{saving}}">
+      {{isEdit ? '保存修改' : '添加菜品'}}
+    </button>
+    <button class="btn-danger" wx:if="{{isEdit}}" bindtap="deleteDish" style="margin-top: 16rpx;">
+      删除菜品
+    </button>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

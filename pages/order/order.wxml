@@ -1,0 +1,37 @@
+<!-- pages/order/order.wxml -->
+<view class="order-container">
+  <!-- 状态筛选 -->
+  <view class="filter-bar">
+    <view
+      class="filter-item {{activeFilter === 'pending' ? 'filter-active' : ''}}"
+      bindtap="setFilter"
+      data-filter="pending"
+    >待处理</view>
+    <view
+      class="filter-item {{activeFilter === 'done' ? 'filter-active' : ''}}"
+      bindtap="setFilter"
+      data-filter="done"
+    >已完成</view>
+    <view
+      class="filter-item {{activeFilter === 'all' ? 'filter-active' : ''}}"
+      bindtap="setFilter"
+      data-filter="all"
+    >全部</view>
+  </view>
+
+  <!-- 订单列表 -->
+  <scroll-view class="order-list" scroll-y refresher-enabled bindrefresherrefresh="onRefresh" refresher-triggered="{{refreshing}}">
+    <view wx:if="{{orders.length === 0}}" class="empty-state" style="margin-top: 100rpx;">
+      <text style="font-size: 80rpx;">📋</text>
+      <text>暂无订单</text>
+    </view>
+
+    <order-card
+      wx:for="{{orders}}"
+      wx:key="_id"
+      order="{{item}}"
+      bind:complete="onOrderComplete"
+      bind:review="onOrderReview"
+    />
+  </scroll-view>
+</view>

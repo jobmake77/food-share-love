@@ -1,0 +1,123 @@
+/* subpages/cart/cart.wxss */
+.cart-container {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding-bottom: 160rpx;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.cart-img {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 12rpx;
+  background: var(--color-primary-light);
+  flex-shrink: 0;
+}
+
+.cart-info {
+  flex: 1;
+}
+
+.cart-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cart-counter {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.counter-btn {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.minus {
+  background: #FFE5E5;
+  color: var(--color-primary);
+}
+
+.plus {
+  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
+  color: #fff;
+}
+
+.counter-num {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 32rpx;
+  text-align: center;
+}
+
+.note-section {
+  padding-top: 0;
+}
+
+.note-input {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.cart-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-card);
+  padding: 20rpx 32rpx calc(env(safe-area-inset-bottom) + 20rpx);
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  border-top: 1rpx solid var(--color-border);
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.06);
+}
+
+.footer-summary {
+  flex: 1;
+}
+
+.total-count {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
+  color: #fff;
+  border-radius: 44rpx;
+  padding: 0 48rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(255, 107, 107, 0.4);
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+.submit-btn[disabled] {
+  opacity: 0.5;
+}

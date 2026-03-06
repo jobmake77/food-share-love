@@ -1,0 +1,127 @@
+/* components/order-card/order-card.wxss */
+.order-card {
+  margin-bottom: 20rpx;
+  padding: 0;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 20rpx 16rpx;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.creator-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  flex-shrink: 0;
+}
+
+.creator-info {
+  flex: 1;
+}
+
+.creator-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.creator-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.creator-role {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.order-date {
+  display: block;
+  font-size: 22rpx;
+  color: var(--color-text-hint);
+  margin-top: 2rpx;
+}
+
+.order-status {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 24rpx;
+}
+
+.status-done {
+  background: #E8F8E8;
+  color: #52C41A;
+}
+
+.status-pending {
+  background: #FFF3E0;
+  color: #FF8C42;
+}
+
+.dishes-list {
+  padding: 16rpx 20rpx;
+}
+
+.dish-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rpx 0;
+}
+
+.dish-row-name {
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.dish-row-count {
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.order-note {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  padding: 0 20rpx 12rpx;
+  font-style: italic;
+}
+
+.card-footer {
+  display: flex;
+  border-top: 1rpx solid var(--color-border);
+}
+
+.footer-btn {
+  flex: 1;
+  padding: 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+}
+
+.review-btn {
+  color: var(--color-text-secondary);
+  border-right: 1rpx solid var(--color-border);
+}
+
+.complete-btn {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.footer-btn.disabled {
+  color: var(--color-text-hint);
+  opacity: 0.6;
+  pointer-events: none;
+}

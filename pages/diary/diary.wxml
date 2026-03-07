@@ -1,101 +1,102 @@
 <!-- pages/diary/diary.wxml -->
 <view class="diary-container">
-  <!-- 日历头部 -->
-  <view class="calendar-header">
-    <view class="header-content">
-      <text class="cal-title">{{calMode === 'week' ? weekTitle : monthTitle}}</text>
-      <text class="cal-subtitle">饮食日记</text>
+  <!-- 页面标题 -->
+  <view class="diary-header">
+    <text class="diary-title">美食日记 📖</text>
+    <view class="view-toggle">
+      <view
+        class="toggle-btn {{viewMode === 'week' ? 'active' : ''}}"
+        bindtap="toggleViewMode"
+      >
+        <text class="toggle-icon">📅</text>
+      </view>
+      <view
+        class="toggle-btn {{viewMode === 'month' ? 'active' : ''}}"
+        bindtap="toggleViewMode"
+      >
+        <text class="toggle-icon">📆</text>
+      </view>
     </view>
-    <view class="header-actions">
-      <view class="cal-nav" bindtap="prevPeriod">
+  </view>
+
+  <!-- 日历卡片 -->
+  <view class="calendar-card">
+    <!-- 月份导航 -->
+    <view class="calendar-nav">
+      <view class="nav-btn" bindtap="prevMonth">
         <text class="nav-icon">‹</text>
       </view>
-      <view class="cal-mode-toggle" bindtap="toggleCalMode">
-        <text class="toggle-text">{{calMode === 'week' ? '周' : '月'}}</text>
-      </view>
-      <view class="cal-nav" bindtap="nextPeriod">
+      <text class="calendar-month">{{currentYear}}年 {{months[currentMonth]}}</text>
+      <view class="nav-btn" bindtap="nextMonth">
         <text class="nav-icon">›</text>
       </view>
     </view>
-  </view>
 
-  <!-- 周历 / 月历 -->
-  <view class="calendar-body">
-    <!-- 星期行 -->
-    <view class="weekday-row">
-      <view class="weekday" wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">{{item}}</view>
+    <!-- 星期标题 -->
+    <view class="weekdays">
+      <text class="weekday" wx:for="{{weekDays}}" wx:key="*this">{{item}}</text>
     </view>
 
-    <!-- 日期格子 -->
-    <view class="dates-grid">
+    <!-- 日期网格 -->
+    <view class="calendar-grid">
       <view
-        class="date-cell {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isEmpty ? 'empty-cell' : ''}} {{item.hasOrder ? 'has-order' : ''}}"
-        wx:for="{{calDates}}"
-        wx:key="dateStr"
+        class="calendar-day {{item.empty ? 'empty' : ''}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.hasEntry ? 'has-entry' : ''}}"
+        wx:for="{{calendarDays}}"
+        wx:key="dateKey"
+        data-date="{{item.dateKey}}"
         bindtap="selectDate"
-        data-date="{{item.dateStr}}"
       >
-        <text class="date-num">{{item.day}}</text>
-        <view class="order-indicator" wx:if="{{item.hasOrder}}"></view>
+        <text wx:if="{{!item.empty}}">{{item.day}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 选中日期的订单 -->
-  <view class="day-orders">
-    <view class="section-header">
-      <text class="section-title">{{selectedDateLabel}}</text>
-      <text class="section-count" wx:if="{{dayOrders.length > 0}}">{{dayOrders.length}}条记录</text>
-    </view>
-
-    <view wx:if="{{dayOrders.length === 0}}" class="empty-state">
-      <text class="empty-icon">🍽️</text>
-      <text class="empty-text">这天还没有饮食记录</text>
-    </view>
-
-    <!-- 日记卡片 -->
-    <view class="diary-card" wx:for="{{dayOrders}}" wx:key="_id">
-      <!-- 头部：头像 + 昵称 + 时间 -->
-      <view class="diary-header">
-        <image class="diary-avatar" src="{{item.creatorAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
-        <view class="diary-info">
-          <text class="diary-name">{{item.creatorName}}</text>
-          <text class="diary-time">{{item.timeStr}}</text>
-        </view>
+  <!-- 选中日期详情 -->
+  <view class="entry-detail" wx:if="{{selectedEntry}}">
+    <!-- 头部信息 -->
+    <view class="entry-header">
+      <view class="chef-avatar">
+        {{selectedEntry.chef === '小明' ? '👨‍🍳' : '👩‍🍳'}}
       </view>
+      <view class="entry-info">
+        <text class="chef-name">{{selectedEntry.chef}}</text>
+        <text class="entry-date">{{selectedDate}}</text>
+      </view>
+      <view class="entry-rating">
+        <text class="rating-heart" wx:for="{{selectedEntry.rating}}" wx:key="*this">❤️</text>
+      </view>
+    </view>
 
-      <!-- 菜品图片横向滚动 -->
-      <view class="dish-images-container" wx:if="{{item.dishes.length > 0}}">
-        <scroll-view
-          class="dish-images-scroll {{item.expanded ? 'expanded' : ''}}"
-          scroll-x="{{item.expanded}}"
-          enable-flex
-        >
-          <view class="dish-images-wrapper">
-            <image
-              class="dish-image"
-              wx:for="{{item.dishes}}"
-              wx:key="dishId"
-              wx:for-item="dish"
-              src="{{dish.image || '/assets/default-dish.png'}}"
-              mode="aspectFill"
-            />
-          </view>
-        </scroll-view>
-
-        <!-- 展开按钮 -->
+    <!-- 菜品图片 -->
+    <view class="dish-images" wx:if="{{selectedEntry.images}}">
+      <scroll-view class="images-scroll" scroll-x>
         <view
-          class="expand-btn"
-          wx:if="{{item.dishes.length > 4 && !item.expanded}}"
-          bindtap="toggleExpand"
-          data-order-id="{{item._id}}"
+          class="dish-image-box"
+          wx:for="{{expandedImages ? selectedEntry.images : selectedEntry.images.slice(0, 4)}}"
+          wx:key="*this"
         >
-          <text class="expand-icon">›</text>
+          <text>{{item}}</text>
         </view>
-      </view>
-
-      <!-- 备注 -->
-      <text class="diary-note" wx:if="{{item.note}}">{{item.note}}</text>
+        <view
+          class="more-images-btn"
+          wx:if="{{!expandedImages && selectedEntry.images.length > 4}}"
+          bindtap="expandImages"
+        >
+          +{{selectedEntry.images.length - 4}}
+        </view>
+      </scroll-view>
     </view>
+
+    <!-- 菜品标签 -->
+    <view class="dish-tags">
+      <text class="dish-tag" wx:for="{{selectedEntry.dishes}}" wx:key="*this">
+        {{item}}
+      </text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-entry" wx:else>
+    选择日期查看美食回忆 💭
   </view>
 </view>

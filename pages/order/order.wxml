@@ -1,37 +1,150 @@
 <!-- pages/order/order.wxml -->
 <view class="order-container">
-  <!-- 状态筛选 -->
-  <view class="filter-bar">
+  <!-- 页面标题 -->
+  <text class="order-title">我的订单 📋</text>
+
+  <!-- 标签页 -->
+  <view class="tabs-container">
     <view
-      class="filter-item {{activeFilter === 'pending' ? 'filter-active' : ''}}"
-      bindtap="setFilter"
-      data-filter="pending"
-    >待处理</view>
+      class="tab-btn {{activeTab === '全部' ? 'active' : ''}}"
+      data-tab="全部"
+      bindtap="switchTab"
+    >
+      全部
+    </view>
     <view
-      class="filter-item {{activeFilter === 'done' ? 'filter-active' : ''}}"
-      bindtap="setFilter"
-      data-filter="done"
-    >已完成</view>
+      class="tab-btn {{activeTab === '待处理' ? 'active' : ''}}"
+      data-tab="待处理"
+      bindtap="switchTab"
+    >
+      待处理
+    </view>
     <view
-      class="filter-item {{activeFilter === 'all' ? 'filter-active' : ''}}"
-      bindtap="setFilter"
-      data-filter="all"
-    >全部</view>
+      class="tab-btn {{activeTab === '已完成' ? 'active' : ''}}"
+      data-tab="已完成"
+      bindtap="switchTab"
+    >
+      已完成
+    </view>
   </view>
 
   <!-- 订单列表 -->
-  <scroll-view class="order-list" scroll-y refresher-enabled bindrefresherrefresh="onRefresh" refresher-triggered="{{refreshing}}">
-    <view wx:if="{{orders.length === 0}}" class="empty-state" style="margin-top: 100rpx;">
-      <text style="font-size: 80rpx;">📋</text>
-      <text>暂无订单</text>
-    </view>
+  <view class="order-list">
+    <view
+      class="order-card"
+      wx:for="{{filteredOrders}}"
+      wx:key="id"
+      style="animation-delay: {{index * 80}}ms"
+    >
+      <!-- 订单头部 -->
+      <view class="order-header">
+        <text class="order-time">{{item.time}}</text>
+        <view class="order-status status-{{item.status}}">
+          <text class="status-icon">
+            {{item.status === 'cooking' ? '👨‍🍳' : '✓'}}
+          </text>
+          <text>
+            {{item.status === 'cooking' ? '正在烹饪' : '已完成'}}
+          </text>
+        </view>
+      </view>
 
-    <order-card
-      wx:for="{{orders}}"
-      wx:key="_id"
-      order="{{item}}"
-      bind:complete="onOrderComplete"
-      bind:review="onOrderReview"
-    />
-  </scroll-view>
+      <!-- 菜品列表 -->
+      <view class="order-dishes">
+        <text class="dish-name" wx:for="{{item.dishes}}" wx:key="*this">{{item}}</text>
+      </view>
+
+      <!-- 备注 -->
+      <view class="order-note" wx:if="{{item.note}}">
+        💬 {{item.note}}
+      </view>
+
+      <!-- 底部信息 -->
+      <view class="order-footer">
+        <view class="chef-info">
+          <text class="chef-icon">👨‍🍳</text>
+          <text>厨师: {{item.chef}}</text>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="order-actions">
+          <!-- 确认完成按钮 -->
+          <view
+            class="action-btn btn-primary"
+            wx:if="{{item.status === 'cooking'}}"
+            data-id="{{item.id}}"
+            bindtap="confirmDone"
+          >
+            确认完成
+          </view>
+
+          <!-- 去评价按钮 -->
+          <view
+            class="action-btn btn-accent"
+            wx:if="{{item.status === 'done' && !item.rating}}"
+            data-id="{{item.id}}"
+            bindtap="openRatingModal"
+          >
+            去评价
+          </view>
+
+          <!-- 评分显示 -->
+          <view class="order-rating" wx:if="{{item.rating}}">
+            <text class="rating-star" wx:for="{{item.rating}}" wx:key="*this">⭐</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 评价内容 -->
+      <text class="order-review" wx:if="{{item.review}}">
+        "{{item.review}}"
+      </text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{filteredOrders.length === 0}}">
+    暂无订单记录 📭
+  </view>
+
+  <!-- 评价弹窗 -->
+  <view class="rating-modal" wx:if="{{showRatingModal}}" bindtap="closeRatingModal">
+    <view class="modal-content" catchtap>
+      <!-- 弹窗头部 -->
+      <view class="modal-header">
+        <text class="modal-title">评价这顿饭 🍽️</text>
+        <view class="close-btn" bindtap="closeRatingModal">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+
+      <!-- 星级评分 -->
+      <view class="star-rating">
+        <view
+          class="star-btn"
+          wx:for="{{[1, 2, 3, 4, 5]}}"
+          wx:key="*this"
+          data-rating="{{item}}"
+          bindtap="setRating"
+        >
+          <text class="star-icon {{item <= tempRating ? 'active' : 'inactive'}}">
+            {{item <= tempRating ? '⭐' : '☆'}}
+          </text>
+        </view>
+      </view>
+
+      <!-- 评价输入 -->
+      <textarea
+        class="review-input"
+        placeholder="说点什么吧～（选填）"
+        value="{{tempReview}}"
+        bindinput="onReviewInput"
+      />
+
+      <!-- 提交按钮 -->
+      <view class="submit-btn" bindtap="submitRating">
+        提交评价
+      </view>
+    </view>
+  </view>
 </view>

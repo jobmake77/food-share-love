@@ -20,50 +20,106 @@
   </view>
 
   <!-- 主界面（授权后显示） -->
-  <view wx:else>
-    <!-- 顶部情侣展示 -->
-    <view class="home-header">
-      <view class="header-bg"></view>
-      <view class="header-content">
-        <text class="greeting">{{greeting}}</text>
-        <avatar-pair
-          my-avatar="{{userInfo.avatar}}"
-          my-name="{{userInfo.nickname}}"
-          partner-avatar="{{partnerInfo.avatar}}"
-          partner-name="{{partnerInfo.nickname}}"
-          has-partner="{{!!partnerInfo}}"
-        />
+  <view wx:else class="main-content">
+    <!-- Hero 区域 -->
+    <view class="hero-section">
+      <view class="hero-bg"></view>
+      <view class="hero-content">
+        <!-- 情侣头像对 -->
+        <view class="couple-avatars">
+          <view class="avatar-wrapper">
+            <view class="avatar-circle">
+              <image wx:if="{{userInfo.avatar}}" src="{{userInfo.avatar}}" class="avatar-img" mode="aspectFill" />
+              <text wx:else class="avatar-emoji">👨‍🍳</text>
+            </view>
+            <view class="avatar-name-tag">{{userInfo.nickname || '小明'}}</view>
+          </view>
+          <view class="heart-icon">❤️</view>
+          <view class="avatar-wrapper">
+            <view class="avatar-circle">
+              <image wx:if="{{partnerInfo.avatar}}" src="{{partnerInfo.avatar}}" class="avatar-img" mode="aspectFill" />
+              <text wx:else class="avatar-emoji">👩‍🍳</text>
+            </view>
+            <view class="avatar-name-tag">{{partnerInfo.nickname || '小美'}}</view>
+          </view>
+        </view>
+
+        <!-- 动态问候 -->
+        <view class="greeting-text">{{greeting}}</view>
       </view>
     </view>
 
-    <!-- 主功能入口 -->
-    <view class="home-actions page-padding">
-      <view class="action-card order-card" bindtap="goOrder">
-        <view class="action-icon">🍜</view>
-        <view class="action-info">
-          <text class="action-title">我要点单</text>
-          <text class="action-desc">馋了？点单给 TA</text>
+    <!-- 未绑定提示 -->
+    <view class="unbind-alert" wx:if="{{!userInfo.partnerId && loaded}}">
+      <view class="alert-icon">⚠️</view>
+      <view class="alert-content">
+        <view class="alert-title">还没有绑定伙伴</view>
+        <view class="alert-desc">去「我的」页面绑定你的另一半吧～</view>
+      </view>
+      <view class="alert-btn" bindtap="goProfile">去绑定</view>
+    </view>
+
+    <!-- 双卡片操作区 -->
+    <view class="action-cards">
+      <view class="action-card" bindtap="goMenu">
+        <view class="card-icon-wrapper primary">
+          <text class="card-icon">🍽️</text>
         </view>
-        <view class="action-arrow">›</view>
+        <view class="card-title">我要点单</view>
+        <view class="card-desc">挑选今天想吃的菜 🍜</view>
+        <view class="card-bg-emoji">🍜</view>
       </view>
 
-      <view class="action-card wash-card" bindtap="goGame">
-        <view class="action-icon">🎮</view>
-        <view class="action-info">
-          <text class="action-title">决定洗碗</text>
-          <text class="action-desc">游戏见真章</text>
+      <view class="action-card" bindtap="goGame">
+        <view class="card-icon-wrapper accent">
+          <text class="card-icon">🎮</text>
         </view>
-        <view class="action-arrow">›</view>
+        <view class="card-title">游戏</view>
+        <view class="card-desc">玩个小游戏，决定今天谁掌勺 🎮</view>
+        <view class="card-bg-emoji">🎮</view>
       </view>
     </view>
 
-    <!-- 无伙伴时提示绑定 -->
-    <view class="bind-tip page-padding" wx:if="{{!partnerInfo && loaded}}">
-      <view class="bind-card card">
-        <text class="bind-emoji">💑</text>
-        <text class="bind-text">还没有绑定另一半哦</text>
-        <text class="bind-sub">去个人页输入对方识别码来绑定</text>
-        <button class="btn-primary" bindtap="goProfile" style="margin-top: 24rpx;">去绑定</button>
+    <!-- 今日推荐 -->
+    <view class="recommend-section">
+      <view class="section-header">
+        <view class="section-title">今日推荐</view>
+        <view class="section-more" bindtap="goMenu">查看更多 →</view>
+      </view>
+      <view class="recommend-list">
+        <view class="recommend-item" wx:for="{{recommendDishes}}" wx:key="id">
+          <view class="dish-emoji">{{item.emoji}}</view>
+          <view class="dish-info">
+            <view class="dish-name">{{item.name}}</view>
+            <view class="dish-tags">
+              <view class="dish-tag">{{item.tag}}</view>
+              <view class="dish-time">⏱ {{item.time}}</view>
+            </view>
+          </view>
+          <view class="dish-add-btn" bindtap="addDish" data-id="{{item.id}}">+</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 爱情统计 -->
+    <view class="love-stats">
+      <view class="stats-header">
+        <text class="stats-heart">❤️</text>
+        <text class="stats-title">我们的美食故事</text>
+      </view>
+      <view class="stats-grid">
+        <view class="stat-item">
+          <view class="stat-num primary">28</view>
+          <view class="stat-label">共做美食</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-num accent">15</view>
+          <view class="stat-label">拿手好菜</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-num secondary">42</view>
+          <view class="stat-label">在一起(天)</view>
+        </view>
       </view>
     </view>
   </view>

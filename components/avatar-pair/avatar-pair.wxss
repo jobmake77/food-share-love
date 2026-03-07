@@ -11,6 +11,15 @@
   flex-direction: column;
   align-items: center;
   gap: 10rpx;
+  animation: float 3s ease-in-out infinite;
+}
+
+.avatar-item:first-child {
+  animation-delay: 0s;
+}
+
+.avatar-item:last-child {
+  animation-delay: 0.5s;
 }
 
 .avatar-img {
@@ -18,7 +27,7 @@
   height: 96rpx;
   border-radius: 50%;
   background: rgba(255,255,255,0.3);
-  border: 4rpx solid rgba(255,255,255,0.6);
+  border: 4rpx solid rgba(255,255,255,0.8);
 }
 
 .avatar-name {
@@ -38,6 +47,7 @@
 
 .heart-icon {
   font-size: 36rpx;
+  animation: pulseHeart 1.5s ease-in-out infinite;
 }
 
 .avatar-placeholder {

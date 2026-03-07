@@ -3,179 +3,132 @@ const app = getApp()
 
 Page({
   data: {
-    partnerInfo: null,
-    categories: [],
-    dishes: [],
-    activeCategoryIndex: 0,
-    cartMap: {}, // { dishId: count }
-    cartCount: 0,
-    editMode: false,
-    loading: true,
+    chefName: '待定',
+    searchQuery: '',
+    categories: [
+      { name: '家常菜' },
+      { name: '快手菜' },
+      { name: '汤羹' },
+      { name: '甜品' },
+      { name: '饮品' },
+    ],
+    activeCategory: '家常菜',
+    allDishes: [
+      { id: 1, name: '番茄炒蛋', category: '家常菜', emoji: '🍳', desc: '经典家常，酸甜可口', difficulty: '简单' },
+      { id: 2, name: '红烧排骨', category: '家常菜', emoji: '🍖', desc: '浓油赤酱，入口即化', difficulty: '中等' },
+      { id: 3, name: '酸辣土豆丝', category: '快手菜', emoji: '🥔', desc: '爽脆开胃，下饭神器', difficulty: '简单' },
+      { id: 4, name: '紫菜蛋花汤', category: '汤羹', emoji: '🥣', desc: '鲜美清淡，暖心暖胃', difficulty: '简单' },
+      { id: 5, name: '芒果布丁', category: '甜品', emoji: '🍮', desc: '丝滑香甜，恋爱的味道', difficulty: '简单' },
+      { id: 6, name: '可乐鸡翅', category: '家常菜', emoji: '🍗', desc: '甜咸交织，一学就会', difficulty: '简单' },
+      { id: 7, name: '蜜桃冰茶', category: '饮品', emoji: '🍑', desc: '清爽解暑，甜蜜满分', difficulty: '简单' },
+      { id: 8, name: '糖醋里脊', category: '家常菜', emoji: '🥩', desc: '外酥里嫩，酸甜适中', difficulty: '中等' },
+      { id: 9, name: '蒜蓉西兰花', category: '快手菜', emoji: '🥦', desc: '清爽健康，简单美味', difficulty: '简单' },
+      { id: 10, name: '南瓜粥', category: '汤羹', emoji: '🎃', desc: '香甜软糯，养胃佳品', difficulty: '简单' },
+    ],
+    filteredDishes: [],
+    cart: {},
+    totalCount: 0,
   },
 
   onLoad() {
-    this._loadCategories()
+    this.filterDishes()
   },
 
   onShow() {
-    const cart = app.globalData.cart || []
-    const cartMap = {}
-    let cartCount = 0
-    cart.forEach(item => {
-      cartMap[item.dishId] = item.count
-      cartCount += item.count
-    })
-    this.setData({ cartMap, cartCount, partnerInfo: app.globalData.partnerInfo })
+    this._checkTodayChef()
   },
 
-  async _loadCategories() {
-    const db = wx.cloud.database()
+  async _checkTodayChef() {
     try {
-      const { data } = await db.collection('categories')
-        .orderBy('sort', 'asc')
-        .get()
-      const categories = [{ _id: 'all', name: '全部' }, ...data]
-      this.setData({ categories, activeCategoryIndex: 0 })
-      this._loadDishes()
-    } catch (e) {
-      console.error('加载分类失败', e)
-      this.setData({ loading: false })
-    }
-  },
+      const db = wx.cloud.database()
+      const userInfo = app.globalData.userInfo
+      const partnerInfo = app.globalData.partnerInfo
 
-  async _loadDishes() {
-    const db = wx.cloud.database()
-    const { categories, activeCategoryIndex } = this.data
-    const category = categories[activeCategoryIndex]
-    if (!category) return
-
-    this.setData({ loading: true })
-
-    try {
-      let query = db.collection('dishes').orderBy('sort', 'asc')
-      if (category._id !== 'all') {
-        query = query.where({ categoryId: category._id })
+      if (!userInfo || !partnerInfo) {
+        this.setData({ chefName: '待定' })
+        return
       }
-      const { data } = await query.get()
-      this.setData({ dishes: data, loading: false })
+
+      // 查询今天的订单
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+
+      const { data: orders } = await db.collection('orders')
+        .where({
+          createdAt: db.command.gte(today).and(db.command.lt(tomorrow))
+        })
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get()
+
+      if (orders && orders.length > 0) {
+        // 有订单，掌勺人是对方
+        const order = orders[0]
+        const chefName = order.orderedBy === userInfo._id ? partnerInfo.nickname : userInfo.nickname
+        this.setData({ chefName })
+      } else {
+        // 没有订单
+        this.setData({ chefName: '待定' })
+      }
     } catch (e) {
-      console.error('加载菜品失败', e)
-      this.setData({ loading: false })
+      console.error('查询今日订单失败', e)
+      this.setData({ chefName: '待定' })
     }
+  },
+
+  filterDishes() {
+    const { allDishes, activeCategory, searchQuery } = this.data
+    let filtered = allDishes.filter(d => d.category === activeCategory)
+    if (searchQuery) {
+      filtered = filtered.filter(d => d.name.includes(searchQuery))
+    }
+    this.setData({ filteredDishes: filtered })
   },
 
   switchCategory(e) {
-    const index = e.currentTarget.dataset.index
-    this.setData({ activeCategoryIndex: index })
-    this._loadDishes()
-  },
-
-  increaseCount(e) {
-    const { id, dish } = e.currentTarget.dataset
-    const { cartMap } = this.data
-    const newCount = (cartMap[id] || 0) + 1
-    cartMap[id] = newCount
-    this._syncCart(id, dish, newCount)
-    this.setData({
-      [`cartMap.${id}`]: newCount,
-      cartCount: this._calcCartCount(cartMap),
-    })
-  },
-
-  decreaseCount(e) {
-    const { id } = e.currentTarget.dataset
-    const { cartMap, dishes } = this.data
-    const newCount = Math.max(0, (cartMap[id] || 0) - 1)
-    if (newCount === 0) {
-      delete cartMap[id]
-    } else {
-      cartMap[id] = newCount
-    }
-    const dish = dishes.find(d => d._id === id)
-    this._syncCart(id, dish, newCount)
-    this.setData({
-      cartMap: { ...cartMap },
-      cartCount: this._calcCartCount(cartMap),
-    })
-  },
-
-  _calcCartCount(cartMap) {
-    return Object.values(cartMap).reduce((sum, n) => sum + n, 0)
-  },
-
-  _syncCart(dishId, dish, count) {
-    const cart = app.globalData.cart || []
-    const idx = cart.findIndex(i => i.dishId === dishId)
-    if (count <= 0) {
-      if (idx >= 0) cart.splice(idx, 1)
-    } else if (idx >= 0) {
-      cart[idx].count = count
-    } else {
-      cart.push({ dishId, name: dish.name, count, image: dish.image || '' })
-    }
-    app.globalData.cart = cart
-  },
-
-  toggleEditMode() {
-    this.setData({ editMode: !this.data.editMode })
-  },
-
-  addCategory() {
-    const db = wx.cloud.database()
-    wx.showModal({
-      title: '新增分类',
-      editable: true,
-      placeholderText: '请输入分类名称',
-      success: async (res) => {
-        if (res.confirm && res.content) {
-          const name = res.content.trim()
-          if (!name) return
-          try {
-            await db.collection('categories').add({ data: { name, sort: Date.now() } })
-            wx.showToast({ title: '新增成功', icon: 'success' })
-            this._loadCategories()
-          } catch (e) {
-            wx.showToast({ title: '新增失败', icon: 'error' })
-          }
-        }
-      }
-    })
-  },
-
-  async deleteCategory(e) {
-    const db = wx.cloud.database()
-    const { id } = e.currentTarget.dataset
-    if (id === 'all') return
-    wx.showModal({
-      title: '确认删除',
-      content: '删除分类不会删除菜品',
-      success: async (res) => {
-        if (res.confirm) {
-          await db.collection('categories').doc(id).remove()
-          wx.showToast({ title: '已删除', icon: 'success' })
-          this._loadCategories()
-        }
-      }
-    })
-  },
-
-  goAddDish() {
     wx.vibrateShort({ type: 'light' })
-    const { categories, activeCategoryIndex } = this.data
-    const cat = categories[activeCategoryIndex]
-    wx.navigateTo({
-      url: `/subpages/edit-dish/edit-dish?categoryId=${cat && cat._id !== 'all' ? cat._id : ''}`
+    const { category } = e.currentTarget.dataset
+    this.setData({ activeCategory: category }, () => {
+      this.filterDishes()
     })
   },
 
-  editDish(e) {
+  onSearchInput(e) {
+    this.setData({ searchQuery: e.detail.value }, () => {
+      this.filterDishes()
+    })
+  },
+
+  updateCart(e) {
     wx.vibrateShort({ type: 'light' })
-    const dish = e.currentTarget.dataset.dish
-    wx.navigateTo({ url: `/subpages/edit-dish/edit-dish?dishId=${dish._id}` })
+    const { id, delta } = e.currentTarget.dataset
+    const { cart } = this.data
+    const newCount = (cart[id] || 0) + parseInt(delta)
+
+    if (newCount <= 0) {
+      delete cart[id]
+    } else {
+      cart[id] = newCount
+    }
+
+    const totalCount = Object.values(cart).reduce((sum, n) => sum + n, 0)
+    this.setData({ cart, totalCount })
+
+    // 同步到全局
+    app.globalData.cart = Object.entries(cart).map(([dishId, count]) => {
+      const dish = this.data.allDishes.find(d => d.id == dishId)
+      return { dishId, name: dish.name, count, emoji: dish.emoji }
+    })
   },
 
   goCart() {
     wx.vibrateShort({ type: 'light' })
+    if (this.data.totalCount === 0) {
+      wx.showToast({ title: '购物车是空的', icon: 'none' })
+      return
+    }
     wx.navigateTo({ url: '/subpages/cart/cart' })
   },
 })

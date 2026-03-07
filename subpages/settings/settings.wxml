@@ -1,0 +1,40 @@
+<!-- subpages/settings/settings.wxml -->
+<view class="settings-container">
+  <view class="settings-section">
+    <text class="section-title">个人信息</text>
+
+    <!-- 头像 -->
+    <view class="setting-item" bindtap="chooseAvatar">
+      <view class="item-left">
+        <text class="item-icon">📷</text>
+        <text class="item-label">头像</text>
+      </view>
+      <view class="item-right">
+        <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar-preview" mode="aspectFill" />
+        <text wx:else class="avatar-emoji">{{avatarEmoji}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 昵称 -->
+    <view class="setting-item">
+      <view class="item-left">
+        <text class="item-icon">✏️</text>
+        <text class="item-label">昵称</text>
+      </view>
+      <view class="item-right">
+        <input
+          class="nickname-input"
+          placeholder="请输入昵称"
+          value="{{nickname}}"
+          bindinput="onNicknameInput"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-btn" bindtap="saveSettings">
+    保存
+  </view>
+</view>

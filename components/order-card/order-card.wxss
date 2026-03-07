@@ -3,6 +3,9 @@
   margin-bottom: 20rpx;
   padding: 0;
   overflow: hidden;
+  border-radius: var(--radius-lg);
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 .card-header {
@@ -41,8 +44,8 @@
   font-size: 20rpx;
   padding: 2rpx 10rpx;
   border-radius: 8rpx;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: var(--gradient-warm);
+  color: #fff;
 }
 
 .order-date {
@@ -64,8 +67,8 @@
 }
 
 .status-pending {
-  background: #FFF3E0;
-  color: #FF8C42;
+  background: var(--color-secondary);
+  color: var(--color-primary);
 }
 
 .dishes-list {

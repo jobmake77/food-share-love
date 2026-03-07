@@ -7,7 +7,7 @@
 .image-upload {
   position: relative;
   height: 400rpx;
-  background: var(--color-primary-light);
+  background: var(--color-secondary);
   overflow: hidden;
 }
 

@@ -1,15 +1,21 @@
 /* components/dish-card/dish-card.wxss */
 .dish-card {
   background: var(--color-card);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-card);
+  transition: all 0.3s ease;
+}
+
+.dish-card:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
 }
 
 .dish-image {
   width: 100%;
   height: 200rpx;
-  background: var(--color-primary-light);
+  background: var(--color-secondary);
 }
 
 .dish-body {

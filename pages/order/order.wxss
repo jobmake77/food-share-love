@@ -1,33 +1,318 @@
 /* pages/order/order.wxss */
 .order-container {
-  height: 100vh;
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding: 40rpx 40rpx 160rpx;
+}
+
+/* ========== 页面标题 ========== */
+.order-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 32rpx;
+}
+
+/* ========== 标签页 ========== */
+.tabs-container {
+  display: flex;
+  gap: 8rpx;
+  padding: 8rpx;
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  margin-bottom: 40rpx;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 16rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  color: var(--color-text-hint);
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  background: var(--gradient-warm);
+  color: #fff;
+  box-shadow: var(--shadow-warm);
+}
+
+/* ========== 订单列表 ========== */
+.order-list {
   display: flex;
   flex-direction: column;
-  background: var(--color-bg);
+  gap: 24rpx;
 }
 
-.filter-bar {
-  display: flex;
+.order-card {
   background: var(--color-card);
-  padding: 0 24rpx;
-  border-bottom: 1rpx solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 32rpx;
+  box-shadow: var(--shadow-card);
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
-.filter-item {
-  padding: 24rpx 32rpx;
+.order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.order-time {
+  font-size: 18rpx;
+  color: var(--color-text-hint);
+}
+
+.order-status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 18rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 48rpx;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: var(--color-secondary);
+  color: var(--color-text-hint);
+}
+
+.status-cooking {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.status-done {
+  background: var(--color-secondary);
+  color: var(--color-text-primary);
+}
+
+.status-icon {
+  font-size: 20rpx;
+}
+
+/* 菜品列表 */
+.order-dishes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.dish-name {
   font-size: 28rpx;
-  color: var(--color-text-secondary);
-  border-bottom: 4rpx solid transparent;
-  margin-bottom: -1rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
-.filter-active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
+/* 备注 */
+.order-note {
+  font-size: 18rpx;
+  color: var(--color-text-hint);
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
+  padding: 12rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+/* 底部信息 */
+.order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chef-info {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 18rpx;
+  color: var(--color-text-hint);
+}
+
+.chef-icon {
+  font-size: 20rpx;
+}
+
+/* 操作按钮 */
+.order-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.action-btn {
+  padding: 12rpx 24rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  box-shadow: var(--shadow-warm);
+  transition: all 0.3s ease;
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-primary {
+  background: var(--gradient-warm);
+  color: #fff;
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* 评分 */
+.order-rating {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.rating-star {
+  font-size: 20rpx;
+}
+
+.order-review {
+  font-size: 18rpx;
+  color: var(--color-text-hint);
+  margin-top: 16rpx;
+  font-style: italic;
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  text-align: center;
+  padding: 120rpx 0;
+  color: var(--color-text-hint);
+  font-size: 28rpx;
+}
+
+/* ========== 评价弹窗 ========== */
+.rating-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10rpx);
+  padding: 0 64rpx;
+}
+
+.modal-content {
+  width: 100%;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 48rpx;
+  box-shadow: var(--shadow-warm);
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32rpx;
+}
+
+.modal-title {
+  font-size: 32rpx;
   font-weight: 700;
+  color: var(--color-text-primary);
 }
 
-.order-list {
-  flex: 1;
+.close-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-btn:active {
+  background: var(--color-secondary);
+}
+
+.close-icon {
+  font-size: 32rpx;
+  color: var(--color-text-hint);
+}
+
+/* 星级评分 */
+.star-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.star-btn {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.star-btn:active {
+  transform: scale(1.25);
+}
+
+.star-icon {
+  font-size: 64rpx;
+}
+
+.star-icon.active {
+  color: var(--color-accent);
+}
+
+.star-icon.inactive {
+  color: var(--color-text-hint);
+  opacity: 0.3;
+}
+
+/* 评价输入 */
+.review-input {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 24rpx;
+  background: var(--color-secondary);
+  border-radius: var(--radius-md);
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  margin-bottom: 32rpx;
+}
+
+/* 提交按钮 */
+.submit-btn {
+  width: 100%;
   padding: 20rpx;
+  background: var(--gradient-warm);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 28rpx;
+  font-weight: 600;
+  box-shadow: var(--shadow-warm);
+  transition: all 0.3s ease;
+}
+
+.submit-btn:active {
+  transform: scale(0.97);
 }

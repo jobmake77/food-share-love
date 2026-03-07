@@ -16,54 +16,56 @@
         "order-success/order-success",
         "import-sample/import-sample",
         "import-menu/import-menu",
-        "feedback/feedback"
+        "feedback/feedback",
+        "settings/settings"
       ]
     }
   ],
   "tabBar": {
+    "custom": false,
     "color": "#999999",
-    "selectedColor": "#FF6B6B",
-    "backgroundColor": "#FFFFFF",
+    "selectedColor": "#F27D5E",
+    "backgroundColor": "rgba(255, 255, 255, 0.95)",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/home",
         "text": "首页",
         "iconPath": "assets/icons/home.png",
-        "selectedIconPath": "assets/icons/home.png"
+        "selectedIconPath": "assets/icons/home-active.png"
       },
       {
         "pagePath": "pages/menu/menu",
         "text": "菜单",
         "iconPath": "assets/icons/menu.png",
-        "selectedIconPath": "assets/icons/menu.png"
-      },
-      {
-        "pagePath": "pages/diary/diary",
-        "text": "日记",
-        "iconPath": "assets/icons/diary.png",
-        "selectedIconPath": "assets/icons/diary.png"
+        "selectedIconPath": "assets/icons/menu-active.png"
       },
       {
         "pagePath": "pages/order/order",
         "text": "订单",
         "iconPath": "assets/icons/order.png",
-        "selectedIconPath": "assets/icons/order.png"
+        "selectedIconPath": "assets/icons/order-active.png"
+      },
+      {
+        "pagePath": "pages/diary/diary",
+        "text": "日记",
+        "iconPath": "assets/icons/diary.png",
+        "selectedIconPath": "assets/icons/diary-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
         "text": "我的",
         "iconPath": "assets/icons/profile.png",
-        "selectedIconPath": "assets/icons/profile.png"
+        "selectedIconPath": "assets/icons/profile-active.png"
       }
     ]
   },
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#FF6B6B",
-    "navigationBarTitleText": "食分爱",
+    "navigationBarBackgroundColor": "#F27D5E",
+    "navigationBarTitleText": "食物分享爱",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#FFF8F5",
+    "backgroundColor": "#FFFCF5",
     "enablePullDownRefresh": false,
     "onReachBottomDistance": 50
   },

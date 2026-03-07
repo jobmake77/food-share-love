@@ -9,10 +9,12 @@ Page({
     loaded: false,
     needAuth: false, // 是否需要授权
     authLoading: false, // 授权中
+    recommendDishes: [],
   },
 
   onLoad() {
     this._setGreeting()
+    this._generateRecommendations()
   },
 
   onShow() {
@@ -21,10 +23,10 @@ Page({
 
   _setGreeting() {
     const hour = new Date().getHours()
-    let greeting = '早上好 ☀️'
-    if (hour >= 12 && hour < 14) greeting = '中午好 🍱'
-    else if (hour >= 14 && hour < 18) greeting = '下午好 ☕'
-    else if (hour >= 18) greeting = '晚上好 🌙'
+    let greeting = '早安 ☀️ 今天想吃点什么？'
+    if (hour >= 11 && hour < 14) greeting = '午安 🌤️ 该准备午饭啦~'
+    else if (hour >= 14 && hour < 18) greeting = '下午好 🍵 来杯下午茶？'
+    else if (hour >= 18) greeting = '晚上好 🌙 今晚吃什么呢？'
     this.setData({ greeting })
   },
 
@@ -170,5 +172,113 @@ Page({
   goProfile() {
     wx.vibrateShort({ type: 'light' })
     wx.switchTab({ url: '/pages/profile/profile' })
+  },
+
+  goMenu() {
+    wx.vibrateShort({ type: 'light' })
+    wx.switchTab({ url: '/pages/menu/menu' })
+  },
+
+  addDish(e) {
+    wx.vibrateShort({ type: 'light' })
+    const { id } = e.currentTarget.dataset
+    wx.showToast({
+      title: '已添加到菜单',
+      icon: 'success'
+    })
+  },
+
+  // 生成今日推荐
+  async _generateRecommendations() {
+    try {
+      const db = wx.cloud.database()
+
+      // 尝试从数据库获取菜品
+      const { data: allDishes } = await db.collection('dishes').get()
+
+      if (allDishes && allDishes.length > 0) {
+        // 按类别分组（使用新的分类系统）
+        const grouped = {
+          meat: allDishes.filter(d => d.category === 'meat'),
+          vegetable: allDishes.filter(d => d.category === 'vegetable'),
+          soup: allDishes.filter(d => d.category === 'soup'),
+          dessert: allDishes.filter(d => d.category === 'dessert')
+        }
+
+        const recommendations = []
+
+        // 必选：1道荤菜
+        if (grouped.meat.length > 0) {
+          recommendations.push(this._randomPick(grouped.meat))
+        }
+
+        // 必选：1道素菜
+        if (grouped.vegetable.length > 0) {
+          recommendations.push(this._randomPick(grouped.vegetable))
+        }
+
+        // 必选：1道汤品或甜点（随机选择）
+        const extras = [...grouped.soup, ...grouped.dessert]
+        if (extras.length > 0) {
+          recommendations.push(this._randomPick(extras))
+        }
+
+        this.setData({ recommendDishes: recommendations })
+      } else {
+        // 数据库为空，使用默认推荐
+        this._useFallbackRecommendations()
+      }
+    } catch (e) {
+      console.error('生成推荐失败', e)
+      // 数据库查询失败，使用默认推荐
+      this._useFallbackRecommendations()
+    }
+  },
+
+  // 使用默认推荐（从硬编码菜品中智能选择）
+  _useFallbackRecommendations() {
+    const fallbackDishes = [
+      { id: 1, name: '番茄炒蛋', tag: '简单快手', emoji: '🍳', time: '15min', type: 'vegetable' },
+      { id: 2, name: '红烧排骨', tag: '经典硬菜', emoji: '🍖', time: '45min', type: 'meat' },
+      { id: 3, name: '清炒时蔬', tag: '健康低卡', emoji: '🥬', time: '10min', type: 'vegetable' },
+      { id: 4, name: '紫菜蛋花汤', tag: '鲜美清淡', emoji: '🥣', time: '10min', type: 'soup' },
+      { id: 5, name: '可乐鸡翅', tag: '甜咸交织', emoji: '🍗', time: '30min', type: 'meat' },
+      { id: 6, name: '糖醋里脊', tag: '酸甜适中', emoji: '🥩', time: '35min', type: 'meat' },
+      { id: 7, name: '蒜蓉西兰花', tag: '清爽健康', emoji: '🥦', time: '8min', type: 'vegetable' },
+      { id: 8, name: '南瓜粥', tag: '香甜软糯', emoji: '🎃', time: '20min', type: 'soup' },
+      { id: 9, name: '芒果布丁', tag: '丝滑香甜', emoji: '🍮', time: '15min', type: 'dessert' },
+    ]
+
+    const grouped = {
+      meat: fallbackDishes.filter(d => d.type === 'meat'),
+      vegetable: fallbackDishes.filter(d => d.type === 'vegetable'),
+      soup: fallbackDishes.filter(d => d.type === 'soup'),
+      dessert: fallbackDishes.filter(d => d.type === 'dessert')
+    }
+
+    const recommendations = []
+
+    // 1道荤菜
+    if (grouped.meat.length > 0) {
+      recommendations.push(this._randomPick(grouped.meat))
+    }
+
+    // 1道素菜
+    if (grouped.vegetable.length > 0) {
+      recommendations.push(this._randomPick(grouped.vegetable))
+    }
+
+    // 1道汤品或甜点
+    const extras = [...grouped.soup, ...grouped.dessert]
+    if (extras.length > 0) {
+      recommendations.push(this._randomPick(extras))
+    }
+
+    this.setData({ recommendDishes: recommendations })
+  },
+
+  // 随机选择
+  _randomPick(array) {
+    return array[Math.floor(Math.random() * array.length)]
   },
 })

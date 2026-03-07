@@ -1,124 +1,88 @@
 <!-- pages/profile/profile.wxml -->
 <view class="profile-container">
-  <!-- 测试模式切换按钮 -->
-  <view class="test-mode-switch" wx:if="{{showDevMode}}" bindtap="switchRole">
-    <text class="switch-icon">🔄</text>
-    <text class="switch-text">切换身份测试</text>
-  </view>
+  <!-- 个人资料卡片 -->
+  <view class="profile-card">
+    <view class="profile-header">
+      <view class="profile-avatar">{{myAvatar}}</view>
+      <view class="profile-info">
+        <text class="profile-name">{{myName}}</text>
+        <text class="profile-status">
+          {{isBound ? '已绑定 · 在一起第' + daysCount + '天 💕' : '未绑定伙伴'}}
+        </text>
+      </view>
+    </view>
 
-  <!-- 用户信息卡 -->
-  <view class="user-card">
-    <image class="user-avatar" src="{{userInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill" bindtap="chooseAvatar"/>
-    <view class="user-info">
-      <text class="user-name" bindtap="editNickname">{{userInfo.nickname || '点击设置昵称'}}</text>
-      <view class="code-row">
-        <text class="code-label">识别码：</text>
-        <text class="code-value">{{userInfo.code}}</text>
-        <view class="copy-btn" bindtap="copyCode">复制</view>
+    <!-- 识别码 -->
+    <view class="id-code-box">
+      <text class="id-label">识别码</text>
+      <text class="id-value">{{myCode}}</text>
+      <view class="copy-btn" bindtap="copyCode">
+        <text class="copy-icon">{{copied ? '✓' : '📋'}}</text>
+      </view>
+    </view>
+
+    <!-- 统计数据 -->
+    <view class="stats-grid">
+      <view class="stat-item" wx:for="{{stats}}" wx:key="label">
+        <text class="stat-num">{{item.num}}</text>
+        <text class="stat-label">{{item.label}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 伙伴绑定状态 -->
-  <view class="partner-card card" wx:if="{{partnerInfo}}">
-    <image class="partner-avatar" src="{{partnerInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
-    <view class="partner-info">
-      <text class="partner-label">我的另一半</text>
-      <text class="partner-name">{{partnerInfo.nickname}}</text>
+  <!-- 伙伴绑定卡片 -->
+  <view class="partner-card">
+    <view class="card-header">
+      <text class="card-icon">🔗</text>
+      <text class="card-title">伙伴绑定</text>
     </view>
-    <view class="unbind-btn" bindtap="unbindPartner">解绑</view>
-  </view>
 
-  <!-- 绑定伙伴 -->
-  <view class="bind-section card" wx:else>
-    <text class="bind-title">绑定另一半</text>
-
-    <!-- 待确认的绑定请求 -->
-    <view class="bind-requests" wx:if="{{bindRequests.length > 0}}">
-      <text class="requests-title">待确认的绑定请求</text>
-      <view class="request-item" wx:for="{{bindRequests}}" wx:key="_id">
-        <image class="request-avatar" src="{{item.fromAvatar || '/assets/default-avatar.png'}}" mode="aspectFill"/>
-        <view class="request-info">
-          <text class="request-name">{{item.fromName}}</text>
-          <text class="request-hint">想和你绑定</text>
-        </view>
-        <view class="request-actions">
-          <view class="request-btn reject" bindtap="rejectBindRequest" data-request-id="{{item._id}}">拒绝</view>
-          <view class="request-btn accept" bindtap="acceptBindRequest" data-request-id="{{item._id}}">接受</view>
-        </view>
+    <!-- 已绑定状态 -->
+    <view class="partner-info" wx:if="{{isBound}}">
+      <view class="partner-avatar">{{partnerAvatar}}</view>
+      <view class="partner-details">
+        <text class="partner-name">{{partnerName}}</text>
+        <text class="partner-code">{{partnerCode}}</text>
+      </view>
+      <view class="unbind-btn" bindtap="unbindPartner">
+        <text>解绑</text>
       </view>
     </view>
 
-    <view class="bind-input-row">
-      <input
-        class="bind-input"
-        placeholder="输入对方的6位识别码"
-        value="{{partnerCode}}"
-        bindinput="onPartnerCodeInput"
-        maxlength="6"
-      />
-      <button class="bind-submit-btn" bindtap="bindPartner" loading="{{binding}}">发送请求</button>
-    </view>
-
-    <!-- 开发测试模式 -->
-    <view class="dev-test-section" wx:if="{{showDevMode}}">
-      <view class="dev-divider">
-        <text class="dev-divider-text">开发测试</text>
-      </view>
-      <button class="btn-ghost" bindtap="createTestPartner" loading="{{creatingTest}}">
-        创建测试伙伴账号
-      </button>
-      <text class="dev-hint">仅用于开发测试，会自动创建虚拟伙伴并完成绑定</text>
+    <!-- 未绑定状态 -->
+    <view class="bind-btn" wx:else bindtap="bindPartner">
+      <text class="card-icon">👥</text>
+      <text>绑定伙伴</text>
     </view>
   </view>
 
   <!-- 设置列表 -->
-  <view class="settings-list card">
-    <view class="setting-item" bindtap="handleWechatAuth" wx:if="{{userInfo.nickname === '美食爱好者' && !userInfo.avatar}}">
-      <text class="setting-icon">✅</text>
-      <text class="setting-label">完善资料（微信授权）</text>
+  <view class="settings-card">
+    <view
+      class="setting-item"
+      wx:for="{{settingsItems}}"
+      wx:key="label"
+      data-label="{{item.label}}"
+      bindtap="handleSettingTap"
+    >
+      <view class="setting-icon-box">
+        <text>{{item.icon}}</text>
+      </view>
+      <text class="setting-label">{{item.label}}</text>
+      <text class="setting-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
       <text class="setting-arrow">›</text>
     </view>
-    <view class="setting-divider" wx:if="{{userInfo.nickname === '美食爱好者' && !userInfo.avatar}}"></view>
-    <view class="setting-item" bindtap="goMenuManage">
-      <text class="setting-icon">🍽️</text>
-      <text class="setting-label">菜单管理</text>
-      <text class="setting-arrow">›</text>
-    </view>
-    <view class="setting-divider"></view>
-    <view class="setting-item" bindtap="goImportSample">
-      <text class="setting-icon">✨</text>
-      <text class="setting-label">导入示例菜单</text>
-      <text class="setting-arrow">›</text>
-    </view>
-    <view class="setting-divider"></view>
-    <view class="setting-item" bindtap="goImportMenu">
-      <text class="setting-icon">📥</text>
-      <text class="setting-label">导入自定义菜单</text>
-      <text class="setting-arrow">›</text>
-    </view>
-    <view class="setting-divider"></view>
-    <view class="setting-item" bindtap="exportMenu">
-      <text class="setting-icon">📤</text>
-      <text class="setting-label">导出菜单</text>
-      <text class="setting-arrow">›</text>
-    </view>
-    <view class="setting-divider"></view>
-    <view class="setting-item" bindtap="goFeedback">
-      <text class="setting-icon">💬</text>
-      <text class="setting-label">意见反馈</text>
-      <text class="setting-arrow">›</text>
-    </view>
-    <view class="setting-divider"></view>
-    <button class="setting-item setting-btn" open-type="share">
-      <text class="setting-icon">🔗</text>
-      <text class="setting-label">分享小程序</text>
-      <text class="setting-arrow">›</text>
-    </button>
+  </view>
+
+  <!-- 爱的寄语 -->
+  <view class="love-note">
+    <text class="love-icon">❤️</text>
+    <text class="love-text">"最好的爱情，是你做饭来我洗碗"</text>
   </view>
 
   <!-- 退出登录 -->
-  <view class="logout-btn" bindtap="logout">退出登录</view>
-
-  <view class="safe-bottom"></view>
+  <view class="logout-btn" bindtap="logout">
+    <text class="logout-icon">🚪</text>
+    <text>退出登录</text>
+  </view>
 </view>

@@ -1,28 +1,135 @@
 /* app.wxss - 全局样式 */
 
-/* 颜色变量（通过 CSS 自定义属性模拟） */
+/* ========== 设计系统变量 ========== */
 page {
-  --color-primary: #FF6B6B;
-  --color-primary-light: #FFE5E5;
-  --color-secondary: #FF8C42;
-  --color-bg: #FFF8F5;
-  --color-card: #FFFFFF;
+  /* 颜色系统 - 蜜桃粉暖橘渐变 */
+  --color-primary: #F27D5E;
+  --color-accent: #E89BAB;
+  --color-secondary: #FCEEE6;
+  --color-bg: #FFFCF5;
+  --color-card: #FBF8F3;
   --color-text-primary: #333333;
   --color-text-secondary: #666666;
   --color-text-hint: #999999;
   --color-border: #F0E6E6;
   --color-success: #52C41A;
-  --radius-card: 16rpx;
-  --radius-btn: 48rpx;
-  --shadow-card: 0 4rpx 20rpx rgba(255, 107, 107, 0.1);
 
+  /* 渐变系统 */
+  --gradient-warm: linear-gradient(135deg, #F27D5E 0%, #E89BAB 100%);
+  --gradient-soft: linear-gradient(135deg, #FFF8F3 0%, #FCEEE6 100%);
+  --gradient-primary: linear-gradient(135deg, #FCEEE6 0%, #F27D5E 50%, #E89BAB 100%);
+
+  /* 圆角规范 */
+  --radius-sm: 16rpx;
+  --radius-md: 24rpx;
+  --radius-lg: 32rpx;
+  --radius-xl: 48rpx;
+  --radius-card: 24rpx;
+  --radius-btn: 48rpx;
+
+  /* 阴影系统 */
+  --shadow-sm: 0 4rpx 12rpx rgba(242, 125, 94, 0.08);
+  --shadow-md: 0 4rpx 20rpx rgba(242, 125, 94, 0.15);
+  --shadow-lg: 0 8rpx 32rpx rgba(242, 125, 94, 0.2);
+  --shadow-card: 0 4rpx 20rpx rgba(242, 125, 94, 0.12);
+
+  /* 基础样式 */
   background-color: var(--color-bg);
-  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC',
+               'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
   color: var(--color-text-primary);
   font-size: 28rpx;
   line-height: 1.6;
 }
 
+/* ========== 动画定义 ========== */
+/* 淡入上浮 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(32rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 心跳动画 */
+@keyframes pulseHeart {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* 浮动动画 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12rpx);
+  }
+}
+
+/* 渐变流动 */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* ========== 动画类 ========== */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-pulse-heart {
+  animation: pulseHeart 1.5s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-gradient-flow {
+  background-size: 200% 200%;
+  animation: gradientFlow 8s ease infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* 动画延迟 */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+
+/* ========== 通用组件样式 ========== */
 /* 通用卡片 */
 .card {
   background: var(--color-card);
@@ -30,11 +137,17 @@ page {
   box-shadow: var(--shadow-card);
   padding: 24rpx;
   margin-bottom: 20rpx;
+  transition: all 0.3s ease;
+}
+
+.card:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 按钮 */
 .btn-primary {
-  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
+  background: var(--gradient-warm);
   color: #FFFFFF;
   border-radius: var(--radius-btn);
   padding: 24rpx 0;
@@ -43,7 +156,13 @@ page {
   font-weight: 600;
   border: none;
   width: 100%;
-  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.35);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary::after {
@@ -59,6 +178,12 @@ page {
   font-size: 28rpx;
   border: 2rpx solid var(--color-primary);
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+.btn-ghost:active {
+  background: var(--color-secondary);
+  transform: scale(0.95);
 }
 
 .btn-ghost::after {
@@ -107,7 +232,7 @@ page {
 
 /* 徽标 */
 .badge {
-  background: var(--color-primary);
+  background: var(--gradient-warm);
   color: #fff;
   border-radius: 50%;
   width: 36rpx;
@@ -122,5 +247,12 @@ page {
 .avatar {
   border-radius: 50%;
   overflow: hidden;
-  background: var(--color-primary-light);
+  background: var(--color-secondary);
+  border: 4rpx solid rgba(255, 255, 255, 0.8);
+}
+
+/* 性能优化 */
+.optimized-animation {
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }

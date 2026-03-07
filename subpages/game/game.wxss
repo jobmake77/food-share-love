@@ -34,12 +34,18 @@
 
 .game-option {
   background: var(--color-card);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-lg);
   padding: 40rpx 32rpx;
   display: flex;
   align-items: center;
   gap: 24rpx;
   box-shadow: var(--shadow-card);
+  transition: all 0.3s ease;
+}
+
+.game-option:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
 }
 
 .option-icon {
@@ -204,15 +210,15 @@
 .dice {
   width: 150rpx;
   height: 150rpx;
-  background: linear-gradient(135deg, #FF6B6B, #FF8C42);
-  border-radius: 24rpx;
+  background: var(--gradient-warm);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-size: 26rpx;
   font-weight: 700;
-  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
 .result-dice {
@@ -266,11 +272,17 @@
   flex-direction: column;
   align-items: center;
   background: var(--color-card);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-lg);
   padding: 24rpx 20rpx;
   width: 180rpx;
   box-shadow: var(--shadow-card);
   gap: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.rps-btn:active {
+  transform: scale(0.95);
+  box-shadow: var(--shadow-sm);
 }
 
 .rps-icon {

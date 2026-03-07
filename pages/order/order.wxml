@@ -104,7 +104,11 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{filteredOrders.length === 0}}">
-    暂无订单记录 📭
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无订单记录</text>
+    <navigator url="/pages/menu/menu" class="empty-btn">
+      去点餐
+    </navigator>
   </view>
 
   <!-- 评价弹窗 -->

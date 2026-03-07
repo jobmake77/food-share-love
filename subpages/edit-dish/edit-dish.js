@@ -4,10 +4,20 @@ const app = getApp()
 Page({
   data: {
     isEdit: false,
-    dish: { name: '', desc: '', image: '', categoryId: '', sort: 0 },
+    dish: { name: '', desc: '', image: '', categoryId: '', sort: 0, emoji: '' },
     categories: [],
     categoryIndex: 0,
     saving: false,
+    showEmojiModal: false,
+    emojiGroups: [
+      { name: '肉类', emojis: ['🍖', '🍗', '🥩', '🥓', '🍤', '🦐', '🦞', '🐟', '🐠', '🦀'] },
+      { name: '蔬菜', emojis: ['🥬', '🥦', '🥔', '🥕', '🌽', '🥒', '🍅', '🥑', '🍆', '🌶️'] },
+      { name: '主食', emojis: ['🍚', '🍜', '🍝', '🍞', '🥐', '🥖', '🥯', '🥞', '🧇', '🍕'] },
+      { name: '汤羹', emojis: ['🥣', '🍲', '🥘', '🍱', '🍛', '🍜', '🥟', '🥠', '🥡', '🦪'] },
+      { name: '甜品', emojis: ['🍮', '🍰', '🎂', '🧁', '🍪', '🍩', '🍨', '🍦', '🍡', '🥧'] },
+      { name: '饮品', emojis: ['🍵', '☕', '🥤', '🧃', '🧋', '🍹', '🍸', '🥛', '🍺', '🧉'] },
+      { name: '其他', emojis: ['🍳', '🥗', '🌮', '🌯', '🥙', '🥪', '🍔', '🌭', '🥨', '🍿'] }
+    ],
   },
 
   async onLoad(options) {
@@ -85,6 +95,7 @@ Page({
       image: dish.image || '',
       categoryId: cat ? cat._id : '',
       sort: dish.sort || Date.now(),
+      emoji: dish.emoji || '',
     }
     this.setData({ saving: true })
     try {
@@ -101,6 +112,26 @@ Page({
     } finally {
       this.setData({ saving: false })
     }
+  },
+
+  showEmojiPicker() {
+    this.setData({ showEmojiModal: true })
+  },
+
+  hideEmojiPicker() {
+    this.setData({ showEmojiModal: false })
+  },
+
+  stopPropagation() {
+    // 阻止事件冒泡，防止点击弹窗内容时关闭弹窗
+  },
+
+  selectEmoji(e) {
+    const emoji = e.currentTarget.dataset.emoji
+    this.setData({
+      'dish.emoji': emoji,
+      showEmojiModal: false
+    })
   },
 
   async deleteDish() {

@@ -5,33 +5,63 @@ Page({
   data: {
     chefName: '待定',
     searchQuery: '',
-    categories: [
-      { name: '家常菜' },
-      { name: '快手菜' },
-      { name: '汤羹' },
-      { name: '甜品' },
-      { name: '饮品' },
-    ],
-    activeCategory: '家常菜',
-    allDishes: [
-      { id: 1, name: '番茄炒蛋', category: '家常菜', emoji: '🍳', desc: '经典家常，酸甜可口', difficulty: '简单' },
-      { id: 2, name: '红烧排骨', category: '家常菜', emoji: '🍖', desc: '浓油赤酱，入口即化', difficulty: '中等' },
-      { id: 3, name: '酸辣土豆丝', category: '快手菜', emoji: '🥔', desc: '爽脆开胃，下饭神器', difficulty: '简单' },
-      { id: 4, name: '紫菜蛋花汤', category: '汤羹', emoji: '🥣', desc: '鲜美清淡，暖心暖胃', difficulty: '简单' },
-      { id: 5, name: '芒果布丁', category: '甜品', emoji: '🍮', desc: '丝滑香甜，恋爱的味道', difficulty: '简单' },
-      { id: 6, name: '可乐鸡翅', category: '家常菜', emoji: '🍗', desc: '甜咸交织，一学就会', difficulty: '简单' },
-      { id: 7, name: '蜜桃冰茶', category: '饮品', emoji: '🍑', desc: '清爽解暑，甜蜜满分', difficulty: '简单' },
-      { id: 8, name: '糖醋里脊', category: '家常菜', emoji: '🥩', desc: '外酥里嫩，酸甜适中', difficulty: '中等' },
-      { id: 9, name: '蒜蓉西兰花', category: '快手菜', emoji: '🥦', desc: '清爽健康，简单美味', difficulty: '简单' },
-      { id: 10, name: '南瓜粥', category: '汤羹', emoji: '🎃', desc: '香甜软糯，养胃佳品', difficulty: '简单' },
-    ],
+    categories: [],
+    activeCategory: '',
+    allDishes: [],
     filteredDishes: [],
     cart: {},
     totalCount: 0,
   },
 
-  onLoad() {
-    this.filterDishes()
+  async onLoad() {
+    // 串行加载，确保分类先加载完成
+    await this.loadCategories()
+    await this.loadDishes()
+    // 两者都完成后统一过滤
+    if (this.data.categories.length > 0 && this.data.allDishes.length > 0) {
+      this.filterDishes()
+    }
+  },
+
+  async loadCategories() {
+    try {
+      const db = wx.cloud.database()
+      const { data: categories } = await db.collection('categories')
+        .orderBy('sort', 'asc')
+        .get()
+
+      if (categories && categories.length > 0) {
+        this.setData({
+          categories,
+          activeCategory: categories[0]._id
+        })
+      } else {
+        this.setData({ categories: [] })
+        wx.showToast({ title: '暂无分类', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('加载分类失败', e)
+      wx.showToast({ title: '加载分类失败', icon: 'none' })
+    }
+  },
+
+  async loadDishes() {
+    try {
+      const db = wx.cloud.database()
+      const { data: dishes } = await db.collection('dishes')
+        .get()
+
+      this.setData({ allDishes: dishes })
+
+      // 如果没有菜品，提示用户
+      if (dishes.length === 0) {
+        wx.showToast({ title: '暂无菜品，请先添加', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('加载菜品失败', e)
+      wx.showToast({ title: '加载菜品失败，请重试', icon: 'none' })
+      this.setData({ allDishes: [] })
+    }
   },
 
   onShow() {
@@ -80,7 +110,7 @@ Page({
 
   filterDishes() {
     const { allDishes, activeCategory, searchQuery } = this.data
-    let filtered = allDishes.filter(d => d.category === activeCategory)
+    let filtered = allDishes.filter(d => d.categoryId === activeCategory)
     if (searchQuery) {
       filtered = filtered.filter(d => d.name.includes(searchQuery))
     }
@@ -89,8 +119,8 @@ Page({
 
   switchCategory(e) {
     wx.vibrateShort({ type: 'light' })
-    const { category } = e.currentTarget.dataset
-    this.setData({ activeCategory: category }, () => {
+    const { categoryId } = e.currentTarget.dataset
+    this.setData({ activeCategory: categoryId }, () => {
       this.filterDishes()
     })
   },
@@ -118,9 +148,18 @@ Page({
 
     // 同步到全局
     app.globalData.cart = Object.entries(cart).map(([dishId, count]) => {
-      const dish = this.data.allDishes.find(d => d.id == dishId)
-      return { dishId, name: dish.name, count, emoji: dish.emoji }
+      const dish = this.data.allDishes.find(d => d._id == dishId)
+      return {
+        dishId,
+        name: dish.name,
+        count,
+        emoji: dish.emoji,
+        image: dish.image  // 修复：添加 image 字段
+      }
     })
+
+    // 持久化到本地存储
+    wx.setStorageSync('cart', app.globalData.cart)
   },
 
   goCart() {

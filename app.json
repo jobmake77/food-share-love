@@ -17,7 +17,8 @@
         "import-sample/import-sample",
         "import-menu/import-menu",
         "feedback/feedback",
-        "settings/settings"
+        "settings/settings",
+        "category-manage/category-manage"
       ]
     }
   ],

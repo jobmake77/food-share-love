@@ -23,11 +23,16 @@
   <view class="calendar-card">
     <!-- 月份导航 -->
     <view class="calendar-nav">
-      <view class="nav-btn" bindtap="prevMonth">
+      <view class="nav-btn" bindtap="prevPeriod">
         <text class="nav-icon">‹</text>
       </view>
-      <text class="calendar-month">{{currentYear}}年 {{months[currentMonth]}}</text>
-      <view class="nav-btn" bindtap="nextMonth">
+      <text class="calendar-month" wx:if="{{viewMode === 'week'}}">
+        {{currentYear}}年 第{{weekNumber}}周
+      </text>
+      <text class="calendar-month" wx:else>
+        {{currentYear}}年 {{months[currentMonth]}}
+      </text>
+      <view class="nav-btn" bindtap="nextPeriod">
         <text class="nav-icon">›</text>
       </view>
     </view>
@@ -38,7 +43,7 @@
     </view>
 
     <!-- 日期网格 -->
-    <view class="calendar-grid">
+    <view class="calendar-grid {{viewMode === 'week' ? 'week-view' : ''}}">
       <view
         class="calendar-day {{item.empty ? 'empty' : ''}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.hasEntry ? 'has-entry' : ''}}"
         wx:for="{{calendarDays}}"

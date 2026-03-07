@@ -42,6 +42,19 @@
     <view class="form-divider"></view>
 
     <view class="form-item">
+      <text class="form-label">菜品 Emoji</text>
+      <view class="picker-value" bindtap="showEmojiPicker">
+        <view class="emoji-preview">
+          <text class="emoji-text">{{dish.emoji || '🍽️'}}</text>
+          <text style="margin-left: 16rpx;">{{dish.emoji ? '点击更换' : '点击选择'}}</text>
+        </view>
+        <text class="picker-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-item">
       <text class="form-label">所属分类</text>
       <picker
         mode="selector"
@@ -66,6 +79,33 @@
     <button class="btn-danger" wx:if="{{isEdit}}" bindtap="deleteDish" style="margin-top: 16rpx;">
       删除菜品
     </button>
+  </view>
+
+  <!-- Emoji 选择弹窗 -->
+  <view class="emoji-modal" wx:if="{{showEmojiModal}}" bindtap="hideEmojiPicker">
+    <view class="emoji-modal-content" catchtap="stopPropagation">
+      <view class="emoji-modal-header">
+        <text class="emoji-modal-title">选择 Emoji</text>
+        <text class="emoji-modal-close" bindtap="hideEmojiPicker">取消</text>
+      </view>
+      <scroll-view class="emoji-scroll" scroll-y>
+        <view class="emoji-group" wx:for="{{emojiGroups}}" wx:key="name">
+          <view class="emoji-group-title">{{item.name}}</view>
+          <view class="emoji-grid">
+            <view
+              class="emoji-item {{dish.emoji === emoji ? 'active' : ''}}"
+              wx:for="{{item.emojis}}"
+              wx:for-item="emoji"
+              wx:key="*this"
+              data-emoji="{{emoji}}"
+              bindtap="selectEmoji"
+            >
+              {{emoji}}
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 
   <view class="safe-bottom"></view>

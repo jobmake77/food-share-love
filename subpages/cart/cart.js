@@ -24,6 +24,7 @@ Page({
     const item = cart.find(i => i.dishId === id)
     if (item) item.count++
     app.globalData.cart = cart
+    wx.setStorageSync('cart', cart)  // 持久化
     this._syncCart()
   },
 
@@ -36,6 +37,7 @@ Page({
       if (cart[idx].count <= 0) cart.splice(idx, 1)
     }
     app.globalData.cart = cart
+    wx.setStorageSync('cart', cart)  // 持久化
     this._syncCart()
   },
 
@@ -57,9 +59,10 @@ Page({
     this.setData({ placing: true })
     try {
       const orderData = {
-        dishes: cart.map(item => ({ dishId: item.dishId, name: item.name, count: item.count, image: item.image })),
+        dishes: cart.map(item => ({ dishId: item.dishId, name: item.name, count: item.count, image: item.image, emoji: item.emoji })),
         note: note || '',
-        status: 'pending',
+        status: 'cooking',  // 修复：改为 cooking 以匹配订单页面的筛选逻辑
+        orderedBy: userInfo._id,  // 修复：添加点单人ID
         creatorName: userInfo.nickname || '我',
         creatorAvatar: userInfo.avatar || '',
         partnerId: userInfo.partnerId || null,
@@ -67,6 +70,7 @@ Page({
       }
       const { _id } = await db.collection('orders').add({ data: orderData })
       app.globalData.cart = []
+      wx.removeStorageSync('cart')  // 清除本地存储
       wx.navigateTo({ url: `/subpages/order-success/order-success?orderId=${_id}&count=${cart.length}` })
     } catch (e) {
       wx.showToast({ title: '下单失败，请重试', icon: 'error' })

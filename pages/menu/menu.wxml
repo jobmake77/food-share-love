@@ -29,13 +29,19 @@
     <!-- 左侧分类栏 -->
     <scroll-view class="category-sidebar" scroll-y>
       <view
-        class="category-btn {{activeCategory === item.name ? 'active' : ''}}"
+        class="category-btn {{activeCategory === item._id ? 'active' : ''}}"
         wx:for="{{categories}}"
-        wx:key="name"
-        data-category="{{item.name}}"
+        wx:key="_id"
+        data-category-id="{{item._id}}"
         bindtap="switchCategory"
       >
-        {{item.name}}
+        <text class="category-icon">{{item.icon}}</text>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-category" wx:if="{{categories.length === 0}}">
+        <text class="empty-text">暂无分类</text>
       </view>
     </scroll-view>
 
@@ -44,31 +50,31 @@
       <view
         class="dish-card"
         wx:for="{{filteredDishes}}"
-        wx:key="id"
+        wx:key="_id"
         style="animation-delay: {{index * 0.05}}s"
       >
-        <text class="dish-emoji">{{item.emoji}}</text>
+        <text class="dish-emoji">{{item.emoji || '🍽️'}}</text>
 
         <view class="dish-info">
           <text class="dish-name">{{item.name}}</text>
-          <text class="dish-desc">{{item.desc}}</text>
+          <text class="dish-desc">{{item.desc || ''}}</text>
         </view>
 
         <!-- 数量控制 -->
         <view class="dish-controls">
           <view
             class="control-minus"
-            wx:if="{{cart[item.id]}}"
-            data-id="{{item.id}}"
+            wx:if="{{cart[item._id]}}"
+            data-id="{{item._id}}"
             data-delta="-1"
             bindtap="updateCart"
           >
             <text class="control-icon">−</text>
           </view>
-          <text class="control-num" wx:if="{{cart[item.id]}}">{{cart[item.id]}}</text>
+          <text class="control-num" wx:if="{{cart[item._id]}}">{{cart[item._id]}}</text>
           <view
             class="control-plus"
-            data-id="{{item.id}}"
+            data-id="{{item._id}}"
             data-delta="1"
             bindtap="updateCart"
           >

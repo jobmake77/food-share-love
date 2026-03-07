@@ -28,9 +28,17 @@ Page({
     const partnerInfo = app.globalData.partnerInfo
 
     if (userInfo) {
+      // 过滤掉错误的 avatar 值（如果是长字符串ID，使用默认emoji）
+      let avatar = userInfo.avatar || '👨‍🍳'
+      if (avatar.length > 10) {
+        // 如果 avatar 是一个长字符串（可能是ID），使用默认emoji
+        avatar = '👨‍🍳'
+      }
+
       this.setData({
         myName: userInfo.nickname || '小明',
-        myAvatar: userInfo.avatar || '👨‍🍳',
+        myAvatar: avatar,
+        myCode: userInfo.code ? `LOVE-${userInfo.code}` : 'LOVE-8F42B1',
       })
     }
 
@@ -38,6 +46,7 @@ Page({
       this.setData({
         partnerName: partnerInfo.nickname || '小美',
         partnerAvatar: partnerInfo.avatar || '👩‍🍳',
+        partnerCode: partnerInfo.code ? `LOVE-${partnerInfo.code}` : 'LOVE-7B23C9',
         isBound: true,
       })
     }
@@ -82,7 +91,7 @@ Page({
     const { label } = e.currentTarget.dataset
 
     if (label === '菜单管理') {
-      wx.navigateTo({ url: '/subpages/edit-dish/edit-dish' })
+      wx.navigateTo({ url: '/subpages/category-manage/category-manage' })
     } else if (label === '意见反馈') {
       wx.navigateTo({ url: '/subpages/feedback/feedback' })
     } else if (label === '分享给朋友') {

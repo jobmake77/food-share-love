@@ -1,0 +1,109 @@
+<!-- subpages/category-manage/category-manage.wxml -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="header">
+    <text class="title">分类管理</text>
+    <view class="add-btn" bindtap="showAddDialog">
+      <text class="add-icon">+</text>
+      <text class="add-text">新增</text>
+    </view>
+  </view>
+
+  <!-- 分类列表 -->
+  <scroll-view class="category-list" scroll-y>
+    <view
+      class="category-item"
+      wx:for="{{categories}}"
+      wx:key="_id"
+    >
+      <view class="category-icon">{{item.icon}}</view>
+      <view class="category-info">
+        <text class="category-name">{{item.name}}</text>
+        <text class="category-meta">排序: {{item.sort}} · {{item.dishCount}}道菜品</text>
+      </view>
+      <view class="category-actions">
+        <view class="action-btn edit" data-category="{{item}}" bindtap="showEditDialog">
+          <text>编辑</text>
+        </view>
+        <view class="action-btn delete" data-category="{{item}}" bindtap="deleteCategory">
+          <text>删除</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{categories.length === 0}}">
+      <text class="empty-emoji">📋</text>
+      <text class="empty-text">暂无分类</text>
+      <text class="empty-hint">点击右上角"新增"按钮添加分类</text>
+    </view>
+  </scroll-view>
+
+  <!-- 菜品管理入口 -->
+  <view class="bottom-actions">
+    <view class="action-item" bindtap="goToDishManage">
+      <text class="action-icon">🍽️</text>
+      <text class="action-text">菜品管理</text>
+    </view>
+    <view class="action-item" bindtap="goToDataManage">
+      <text class="action-icon">📋</text>
+      <text class="action-text">数据管理</text>
+    </view>
+  </view>
+
+  <!-- 添加/编辑对话框 -->
+  <view class="dialog-mask" wx:if="{{showDialog}}" bindtap="closeDialog">
+    <view class="dialog-content" catchtap="stopPropagation">
+      <view class="dialog-header">
+        <text class="dialog-title">{{dialogMode === 'add' ? '新增分类' : '编辑分类'}}</text>
+        <view class="dialog-close" bindtap="closeDialog">×</view>
+      </view>
+
+      <view class="dialog-body">
+        <!-- 分类名称 -->
+        <view class="form-item">
+          <text class="form-label">分类名称</text>
+          <input
+            class="form-input"
+            placeholder="请输入分类名称"
+            value="{{formData.name}}"
+            bindinput="onNameInput"
+          />
+        </view>
+
+        <!-- 排序号 -->
+        <view class="form-item">
+          <text class="form-label">排序号</text>
+          <input
+            class="form-input"
+            type="number"
+            placeholder="数字越小越靠前"
+            value="{{formData.sort}}"
+            bindinput="onSortInput"
+          />
+        </view>
+
+        <!-- 图标选择 -->
+        <view class="form-item">
+          <text class="form-label">选择图标</text>
+          <view class="emoji-grid">
+            <view
+              class="emoji-item {{formData.icon === item ? 'active' : ''}}"
+              wx:for="{{emojiList}}"
+              wx:key="*this"
+              data-emoji="{{item}}"
+              bindtap="selectEmoji"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="dialog-footer">
+        <view class="dialog-btn cancel" bindtap="closeDialog">取消</view>
+        <view class="dialog-btn confirm" bindtap="saveCategory">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

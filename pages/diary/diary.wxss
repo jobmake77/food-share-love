@@ -109,6 +109,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8rpx;
+  transition: all 0.3s ease;
 }
 
 .calendar-day {
@@ -129,8 +130,10 @@
 }
 
 .calendar-day.today {
-  background: var(--color-secondary);
-  color: var(--color-text-primary);
+  background: linear-gradient(135deg, #F27D5E 0%, #FF9A76 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4rpx 12rpx rgba(242, 125, 94, 0.4);
 }
 
 .calendar-day.selected {
@@ -138,6 +141,12 @@
   color: #fff;
   box-shadow: var(--shadow-warm);
   transform: scale(1.1);
+}
+
+/* 周视图特殊样式 */
+.calendar-grid.week-view .calendar-day {
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .calendar-day.has-entry::after {

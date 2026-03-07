@@ -14,7 +14,10 @@ App({
       })
     }
 
-    this.globalData = {}
+    // 初始化全局数据，从本地存储恢复购物车
+    this.globalData = {
+      cart: wx.getStorageSync('cart') || []
+    }
     this._login()
 
     // 性能监控

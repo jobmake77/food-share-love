@@ -75,7 +75,7 @@
           <text class="card-icon">🎮</text>
         </view>
         <view class="card-title">游戏</view>
-        <view class="card-desc">玩个小游戏，决定今天谁掌勺 🎮</view>
+        <view class="card-desc">今天谁做饭？玩游戏决定</view>
         <view class="card-bg-emoji">🎮</view>
       </view>
     </view>
@@ -109,15 +109,15 @@
       </view>
       <view class="stats-grid">
         <view class="stat-item">
-          <view class="stat-num primary">28</view>
+          <view class="stat-num primary">{{stats.totalDishes}}</view>
           <view class="stat-label">共做美食</view>
         </view>
         <view class="stat-item">
-          <view class="stat-num accent">15</view>
+          <view class="stat-num accent">{{stats.totalOrders}}</view>
           <view class="stat-label">拿手好菜</view>
         </view>
         <view class="stat-item">
-          <view class="stat-num secondary">42</view>
+          <view class="stat-num secondary">{{stats.daysUsed}}</view>
           <view class="stat-label">在一起(天)</view>
         </view>
       </view>

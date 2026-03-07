@@ -10,11 +10,17 @@ Page({
     needAuth: false, // 是否需要授权
     authLoading: false, // 授权中
     recommendDishes: [],
+    stats: {
+      totalDishes: 0,
+      totalOrders: 0,
+      daysUsed: 0
+    }
   },
 
   onLoad() {
     this._setGreeting()
     this._generateRecommendations()
+    this.loadStats()
   },
 
   onShow() {
@@ -143,6 +149,49 @@ Page({
     }
   },
 
+  async loadStats() {
+    try {
+      const db = wx.cloud.database()
+
+      // 统计菜品总数
+      const dishesCount = await db.collection('dishes').count()
+
+      // 统计订单总数
+      const ordersCount = await db.collection('orders').count()
+
+      // 计算使用天数（从第一个订单到现在）
+      const { data: firstOrder } = await db.collection('orders')
+        .orderBy('createdAt', 'asc')
+        .limit(1)
+        .get()
+
+      let daysUsed = 0
+      if (firstOrder.length > 0) {
+        const firstDate = new Date(firstOrder[0].createdAt)
+        const now = new Date()
+        daysUsed = Math.floor((now - firstDate) / (1000 * 60 * 60 * 24))
+      }
+
+      this.setData({
+        stats: {
+          totalDishes: dishesCount.total,
+          totalOrders: ordersCount.total,
+          daysUsed: daysUsed
+        }
+      })
+    } catch (e) {
+      console.error('加载统计数据失败', e)
+      // 使用默认值
+      this.setData({
+        stats: {
+          totalDishes: 0,
+          totalOrders: 0,
+          daysUsed: 0
+        }
+      })
+    }
+  },
+
   // 跳过授权，使用默认信息
   skipAuth() {
     wx.vibrateShort({ type: 'light' })
@@ -190,46 +239,122 @@ Page({
 
   // 生成今日推荐
   async _generateRecommendations() {
+    console.log('开始生成今日推荐...')
+
     try {
+      // 检查云开发是否初始化
+      if (!wx.cloud || !wx.cloud.database) {
+        console.log('云开发未初始化，使用 fallback 数据')
+        this._useFallbackRecommendations()
+        return
+      }
+
       const db = wx.cloud.database()
+
+      // 加载分类信息
+      const { data: categories } = await db.collection('categories').get()
+      console.log('数据库分类数量:', categories ? categories.length : 0)
+
+      // 创建分类名称到ID的映射
+      const categoryMap = {}
+      if (categories && categories.length > 0) {
+        categories.forEach(cat => {
+          categoryMap[cat._id] = cat.name
+        })
+      }
 
       // 尝试从数据库获取菜品
       const { data: allDishes } = await db.collection('dishes').get()
+      console.log('数据库菜品数量:', allDishes ? allDishes.length : 0)
+
+      // 查看第一道菜的数据结构
+      if (allDishes && allDishes.length > 0) {
+        console.log('第一道菜的数据结构:', allDishes[0])
+      }
 
       if (allDishes && allDishes.length > 0) {
-        // 按类别分组（使用新的分类系统）
+        // 按类别分组（使用 categoryId 和分类名称映射）
         const grouped = {
-          meat: allDishes.filter(d => d.category === 'meat'),
-          vegetable: allDishes.filter(d => d.category === 'vegetable'),
-          soup: allDishes.filter(d => d.category === 'soup'),
-          dessert: allDishes.filter(d => d.category === 'dessert')
+          meat: allDishes.filter(d => {
+            const catName = categoryMap[d.categoryId] || d.category || d.type
+            return catName === '荤菜' || catName === 'meat' || catName === '肉类'
+          }),
+          vegetable: allDishes.filter(d => {
+            const catName = categoryMap[d.categoryId] || d.category || d.type
+            return catName === '素菜' || catName === 'vegetable' || catName === '蔬菜'
+          }),
+          soup: allDishes.filter(d => {
+            const catName = categoryMap[d.categoryId] || d.category || d.type
+            return catName === '汤品' || catName === 'soup' || catName === '汤羹'
+          }),
+          dessert: allDishes.filter(d => {
+            const catName = categoryMap[d.categoryId] || d.category || d.type
+            return catName === '甜品' || catName === 'dessert' || catName === '甜点'
+          }),
+          // 其他分类（主食、快手菜等）归入素菜
+          others: allDishes.filter(d => {
+            const catName = categoryMap[d.categoryId] || d.category || d.type
+            return catName === '主食' || catName === '快手菜' || catName === '家常菜'
+          })
         }
+
+        console.log('分组结果:', {
+          meat: grouped.meat.length,
+          vegetable: grouped.vegetable.length,
+          soup: grouped.soup.length,
+          dessert: grouped.dessert.length,
+          others: grouped.others.length
+        })
 
         const recommendations = []
 
-        // 必选：1道荤菜
+        // 优先选择：1道荤菜
         if (grouped.meat.length > 0) {
-          recommendations.push(this._randomPick(grouped.meat))
+          const dish = this._randomPick(grouped.meat)
+          recommendations.push(this._formatDish(dish, '经典硬菜'))
         }
 
-        // 必选：1道素菜
+        // 优先选择：1道素菜（如果没有素菜，从其他分类中选）
         if (grouped.vegetable.length > 0) {
-          recommendations.push(this._randomPick(grouped.vegetable))
+          const dish = this._randomPick(grouped.vegetable)
+          recommendations.push(this._formatDish(dish, '健康低卡'))
+        } else if (grouped.others.length > 0) {
+          const dish = this._randomPick(grouped.others)
+          recommendations.push(this._formatDish(dish, '简单快手'))
         }
 
-        // 必选：1道汤品或甜点（随机选择）
+        // 优先选择：1道汤品或甜点
         const extras = [...grouped.soup, ...grouped.dessert]
         if (extras.length > 0) {
-          recommendations.push(this._randomPick(extras))
+          const dish = this._randomPick(extras)
+          const catName = categoryMap[dish.categoryId] || dish.category || dish.type
+          const tag = catName === '汤品' || catName === 'soup' || catName === '汤羹' ? '鲜美清淡' : '甜蜜满分'
+          recommendations.push(this._formatDish(dish, tag))
         }
 
+        // 确保至少推荐3道菜（如果数据库中有足够的菜品）
+        while (recommendations.length < 3 && allDishes.length > recommendations.length) {
+          // 从所有菜品中随机选择一道还未被推荐的菜
+          const remaining = allDishes.filter(d =>
+            !recommendations.find(r => r.id === (d._id || d.id))
+          )
+          if (remaining.length > 0) {
+            const dish = this._randomPick(remaining)
+            recommendations.push(this._formatDish(dish, '特色推荐'))
+          } else {
+            break
+          }
+        }
+
+        console.log('从数据库生成推荐:', recommendations.length, '道菜')
         this.setData({ recommendDishes: recommendations })
       } else {
         // 数据库为空，使用默认推荐
+        console.log('数据库为空，使用 fallback 数据')
         this._useFallbackRecommendations()
       }
     } catch (e) {
-      console.error('生成推荐失败', e)
+      console.error('生成推荐失败:', e)
       // 数据库查询失败，使用默认推荐
       this._useFallbackRecommendations()
     }
@@ -237,6 +362,8 @@ Page({
 
   // 使用默认推荐（从硬编码菜品中智能选择）
   _useFallbackRecommendations() {
+    console.log('使用 fallback 推荐数据')
+
     const fallbackDishes = [
       { id: 1, name: '番茄炒蛋', tag: '简单快手', emoji: '🍳', time: '15min', type: 'vegetable' },
       { id: 2, name: '红烧排骨', tag: '经典硬菜', emoji: '🍖', time: '45min', type: 'meat' },
@@ -274,11 +401,34 @@ Page({
       recommendations.push(this._randomPick(extras))
     }
 
+    console.log('Fallback 推荐结果:', recommendations)
     this.setData({ recommendDishes: recommendations })
   },
 
   // 随机选择
   _randomPick(array) {
     return array[Math.floor(Math.random() * array.length)]
+  },
+
+  // 格式化菜品数据（确保包含显示所需的所有字段）
+  _formatDish(dish, defaultTag) {
+    return {
+      id: dish._id || dish.id,
+      name: dish.name,
+      emoji: dish.emoji || '🍽️',
+      tag: dish.tag || defaultTag,
+      time: dish.time || this._estimateTime(dish.category),
+    }
+  },
+
+  // 根据类别估算烹饪时间
+  _estimateTime(category) {
+    const timeMap = {
+      'meat': '30-45min',
+      'vegetable': '10-15min',
+      'soup': '15-20min',
+      'dessert': '20-30min'
+    }
+    return timeMap[category] || '20min'
   },
 })

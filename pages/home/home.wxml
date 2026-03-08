@@ -75,7 +75,7 @@
           <text class="card-icon">🎮</text>
         </view>
         <view class="card-title">游戏</view>
-        <view class="card-desc">今天谁做饭？玩游戏决定</view>
+        <view class="card-desc">今天谁洗碗？玩游戏决定</view>
         <view class="card-bg-emoji">🎮</view>
       </view>
     </view>

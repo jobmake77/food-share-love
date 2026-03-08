@@ -1,5 +1,6 @@
 // subpages/category-manage/category-manage.js
 const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
 
 Page({
   data: {
@@ -23,14 +24,27 @@ Page({
     wx.showLoading({ title: '加载中...' })
     try {
       const db = wx.cloud.database()
-      const { data: categories } = await db.collection('categories')
+      const _ = db.command
+      const openids = await app.getCoupleOpenIds()
+      if (openids.length === 0) {
+        this.setData({ categories: [] })
+        return
+      }
+
+      const categories = await fetchAll((skip, limit) => db.collection('categories')
+        .where({ _openid: _.in(openids) })
         .orderBy('sort', 'asc')
-        .get()
+        .skip(skip)
+        .limit(limit)
+        .get())
 
       // 获取每个分类下的菜品数量
       for (let category of categories) {
         const { total } = await db.collection('dishes')
-          .where({ categoryId: category._id })
+          .where({
+            _openid: _.in(openids),
+            categoryId: category._id
+          })
           .count()
         category.dishCount = total
       }
@@ -180,7 +194,7 @@ Page({
 
   goToDishManage() {
     wx.vibrateShort({ type: 'light' })
-    wx.navigateTo({ url: '/subpages/edit-dish/edit-dish' })
+    wx.navigateTo({ url: '/subpages/dish-list/dish-list' })
   },
 
   goToDataManage() {
@@ -188,4 +202,3 @@ Page({
     wx.navigateTo({ url: '/subpages/import-sample/import-sample' })
   }
 })
-

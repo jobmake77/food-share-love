@@ -39,6 +39,7 @@
 | 📦 订单页 | 待完成/已完成筛选、角色权限控制、评价功能 |
 | 👤 个人页 | 头像昵称、识别码、伙伴绑定、菜单导入导出 |
 | 🎮 游戏页 | 疯狂点点点游戏、3秒倒计时、5秒对战 |
+| 🍽️ 菜品列表 | 搜索菜品、分类筛选、编辑/删除菜品、新增菜品 |
 | ✏️ 编辑菜品 | 图片上传、菜品信息编辑、删除功能 |
 | 🛒 购物车 | 数量调整、备注填写、一键下单 |
 | ✨ 导入菜单 | 示例菜单导入、自定义JSON导入 |
@@ -77,10 +78,12 @@ food-share-love/
 ├── subpages/                     # 分包页面
 │   ├── game/                     # 决定掌勺人游戏
 │   ├── edit-dish/                # 编辑/新增菜品
+│   ├── dish-list/                # 菜品列表管理
 │   ├── cart/                     # 购物车结算
 │   ├── order-success/            # 下单成功
 │   ├── feedback/                 # 意见反馈
 │   ├── settings/                 # 个人设置
+│   ├── category-manage/          # 分类管理
 │   ├── import-sample/            # 导入示例菜单
 │   └── import-menu/              # 导入自定义菜单
 ├── components/                   # 自定义组件
@@ -108,7 +111,7 @@ food-share-love/
 | `dishes` | name, desc, image, emoji, category, categoryId, sort | 菜品信息（支持图片和Emoji，category: meat/vegetable/soup/dessert） |
 | `orders` | dishes[], note, status, orderedBy, creatorName, creatorAvatar, partnerId, createdAt, doneAt | 订单记录（status: cooking/done） |
 | `reviews` | orderId, rating, comment, createdAt | 订单评价 |
-| `feedback` | userId, content, createdAt, status | 用户反馈 |
+| `feedbacks` | content, contact, userOpenid, userName, userAvatar, createdAt, status | 用户反馈 |
 
 ### 权限设置建议
 - `users`：所有用户可读，仅创建者可写
@@ -265,6 +268,26 @@ wx.cloud.init({
 
 ## 📝 更新日志
 
+### v2.1.0 (2026-03-08) - 菜品管理功能完善
+
+#### 🍽️ 菜品管理优化
+- ✅ **新增**：菜品列表页面（subpages/dish-list/）
+  - 支持搜索菜品（实时过滤）
+  - 支持按分类筛选（横向滚动标签）
+  - 支持编辑已有菜品（点击进入编辑模式）
+  - 支持删除菜品（带确认对话框）
+  - 支持新增菜品（右上角"新增"按钮）
+  - 支持下拉刷新
+  - 空状态友好提示
+- ✅ 修改分类管理页面的"菜品管理"按钮跳转逻辑
+  - 从直接跳转到新增页面 → 跳转到菜品列表页面
+  - 用户体验更符合预期（先看列表，再选择编辑或新增）
+- ✅ 编辑菜品页面保存后自动返回列表
+
+#### 🔄 用户流程优化
+- 旧流程：个人中心 → 菜单管理 → 分类管理 → 菜品管理 → 直接进入新增页面（无法查看和编辑已有菜品）
+- 新流程：个人中心 → 菜单管理 → 分类管理 → 菜品管理 → 菜品列表 → 编辑/删除/新增
+
 ### v2.0.0 (2026-03-07) - 全面优化版本
 
 #### 🎯 首页优化
@@ -310,7 +333,7 @@ wx.cloud.init({
 - ✅ `orders` 表字段更新：
   - `status`: 简化为 cooking/done
   - `orderedBy`: 记录下单人ID
-- ✅ 新增 `feedback` 表：用户反馈数据
+- ✅ 新增 `feedbacks` 表：用户反馈数据
 
 ---
 

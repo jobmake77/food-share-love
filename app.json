@@ -12,6 +12,7 @@
       "pages": [
         "game/game",
         "edit-dish/edit-dish",
+        "dish-list/dish-list",
         "cart/cart",
         "order-success/order-success",
         "import-sample/import-sample",

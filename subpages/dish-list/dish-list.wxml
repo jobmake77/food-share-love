@@ -1,0 +1,81 @@
+<view class="dish-list-container">
+  <!-- 顶部操作栏 -->
+  <view class="header">
+    <view class="title">菜品管理</view>
+    <view class="add-btn" bindtap="addDish">
+      <text class="icon">+</text>
+      <text>新增</text>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <input
+      class="search-input"
+      placeholder="搜索菜品..."
+      value="{{searchQuery}}"
+      bindinput="onSearchInput"
+    />
+  </view>
+
+  <!-- 分类筛选 -->
+  <scroll-view class="category-tabs" scroll-x>
+    <view
+      class="category-tab {{activeCategory === '' ? 'active' : ''}}"
+      bindtap="switchCategory"
+      data-id=""
+    >
+      全部
+    </view>
+    <view
+      class="category-tab {{activeCategory === item._id ? 'active' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="_id"
+      bindtap="switchCategory"
+      data-id="{{item._id}}"
+    >
+      <text class="category-icon">{{item.icon}}</text>
+      <text>{{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 菜品列表 -->
+  <view class="dish-list">
+    <view class="dish-item" wx:for="{{filteredDishes}}" wx:key="_id">
+      <view class="dish-main" bindtap="editDish" data-id="{{item._id}}">
+        <view class="dish-emoji">{{item.emoji || '🍽️'}}</view>
+        <view class="dish-info">
+          <view class="dish-name">{{item.name}}</view>
+          <view class="dish-desc">{{item.desc || '暂无简介'}}</view>
+          <view class="dish-category">
+            <text wx:for="{{categories}}" wx:for-item="cat" wx:key="_id" wx:if="{{cat._id === item.categoryId}}">
+              {{cat.icon}} {{cat.name}}
+            </text>
+          </view>
+        </view>
+      </view>
+      <view class="dish-actions">
+        <view class="action-btn edit" bindtap="editDish" data-id="{{item._id}}">
+          编辑
+        </view>
+        <view class="action-btn delete" bindtap="deleteDish" data-id="{{item._id}}" data-name="{{item.name}}">
+          删除
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{filteredDishes.length === 0 && !loading}}">
+      <text class="empty-icon">🍽️</text>
+      <text class="empty-text">{{searchQuery ? '没有找到相关菜品' : '还没有添加菜品'}}</text>
+      <view class="empty-btn" bindtap="addDish" wx:if="{{!searchQuery}}">
+        立即添加
+      </view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+</view>

@@ -1,4 +1,7 @@
 // subpages/import-sample/import-sample.js
+const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
+
 const sampleData = {
   categories: [
     { name: '主食', icon: '🍚', sort: 1 },
@@ -52,15 +55,24 @@ Page({
         try {
           wx.showLoading({ title: '导入中...' })
 
+          // 确保用户信息已加载
+          await app.waitForUserInfo()
+          const userInfo = app.globalData.userInfo
+          console.log('当前用户信息:', userInfo)
+
           // 1. 导入分类并记录ID映射
           const categoryMap = {} // { '主食': 'categoryId123', ... }
+          let categoryCount = 0
 
           for (const cat of sampleData.categories) {
             const addRes = await db.collection('categories').add({ data: cat })
             categoryMap[cat.name] = addRes._id
+            categoryCount++
+            console.log(`导入分类: ${cat.name}, ID: ${addRes._id}`)
           }
 
           // 2. 导入菜品，使用映射后的分类ID
+          let dishCount = 0
           for (const dish of sampleData.dishes) {
             const dishData = {
               name: dish.name,
@@ -70,20 +82,31 @@ Page({
               categoryId: categoryMap[dish.categoryName] || '',
               sort: Date.now()
             }
-            await db.collection('dishes').add({ data: dishData })
+            const addRes = await db.collection('dishes').add({ data: dishData })
+            dishCount++
+            console.log(`导入菜品: ${dish.name}, ID: ${addRes._id}, 分类ID: ${dishData.categoryId}`)
           }
 
           wx.hideLoading()
-          wx.showToast({ title: '导入成功！', icon: 'success' })
+          console.log(`导入完成: ${categoryCount} 个分类, ${dishCount} 道菜品`)
+          wx.showToast({
+            title: `导入成功！${categoryCount}分类 ${dishCount}菜品`,
+            icon: 'success',
+            duration: 2000
+          })
 
           setTimeout(() => {
             wx.navigateBack()
-          }, 1500)
+          }, 2000)
 
         } catch (e) {
           wx.hideLoading()
           console.error('导入失败', e)
-          wx.showToast({ title: '导入失败', icon: 'error' })
+          wx.showToast({
+            title: `导入失败: ${e.message || '未知错误'}`,
+            icon: 'none',
+            duration: 3000
+          })
         } finally {
           this.setData({ importing: false })
         }
@@ -103,18 +126,36 @@ Page({
 
         this.setData({ clearing: true })
         const db = wx.cloud.database()
+        const _ = db.command
+
+        await app.waitForUserInfo()
+        await app.loadPartnerInfo()
+        const openids = await app.getCoupleOpenIds()
+        if (openids.length === 0) {
+          wx.showToast({ title: '未登录，无法清空', icon: 'none' })
+          this.setData({ clearing: false })
+          return
+        }
 
         try {
           wx.showLoading({ title: '清空中...' })
 
           // 1. 获取所有分类并删除
-          const { data: categories } = await db.collection('categories').get()
+          const categories = await fetchAll((skip, limit) => db.collection('categories')
+            .where({ _openid: _.in(openids) })
+            .skip(skip)
+            .limit(limit)
+            .get())
           for (const cat of categories) {
             await db.collection('categories').doc(cat._id).remove()
           }
 
           // 2. 获取所有菜品并删除
-          const { data: dishes } = await db.collection('dishes').get()
+          const dishes = await fetchAll((skip, limit) => db.collection('dishes')
+            .where({ _openid: _.in(openids) })
+            .skip(skip)
+            .limit(limit)
+            .get())
           for (const dish of dishes) {
             await db.collection('dishes').doc(dish._id).remove()
           }

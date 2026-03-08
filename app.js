@@ -1,5 +1,6 @@
 // app.js
 App({
+  userInfoReadyCallbacks: [],
   onLaunch() {
     // 性能优化：启用被动事件监听
     wx.setEnableDebug({ enableDebug: false })
@@ -15,9 +16,7 @@ App({
     }
 
     // 初始化全局数据，从本地存储恢复购物车
-    this.globalData = {
-      cart: wx.getStorageSync('cart') || []
-    }
+    this.globalData.cart = wx.getStorageSync('cart') || []
     this._login()
 
     // 性能监控
@@ -45,12 +44,66 @@ App({
           if (this.userInfoReadyCallback) {
             this.userInfoReadyCallback(res.result.userInfo)
           }
+          if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
+            this.userInfoReadyCallbacks.forEach(callback => callback(res.result.userInfo))
+            this.userInfoReadyCallbacks = []
+          }
         }
       },
       fail: err => {
         console.error('登录失败', err)
       }
     })
+  },
+
+  waitForUserInfo() {
+    if (this.globalData.userInfo) {
+      return Promise.resolve(this.globalData.userInfo)
+    }
+    return new Promise(resolve => {
+      if (!this.userInfoReadyCallbacks) {
+        this.userInfoReadyCallbacks = []
+      }
+      this.userInfoReadyCallbacks.push(resolve)
+    })
+  },
+
+  async loadPartnerInfo() {
+    const userInfo = await this.waitForUserInfo()
+    if (!userInfo || !userInfo.partnerId) {
+      this.globalData.partnerInfo = null
+      return null
+    }
+
+    if (this.globalData.partnerInfo && this.globalData.partnerInfo._id === userInfo.partnerId) {
+      return this.globalData.partnerInfo
+    }
+
+    try {
+      const db = wx.cloud.database()
+      const { data } = await db.collection('users').doc(userInfo.partnerId).get()
+      this.globalData.partnerInfo = data
+      return data
+    } catch (e) {
+      console.error('获取伙伴信息失败', e)
+      return null
+    }
+  },
+
+  async getCoupleOpenIds() {
+    const userInfo = await this.waitForUserInfo()
+    if (!userInfo) return []
+
+    const openids = []
+    // 修复：使用 openid 而不是 _openid
+    if (userInfo.openid) openids.push(userInfo.openid)
+
+    const partnerInfo = await this.loadPartnerInfo()
+    if (partnerInfo && partnerInfo.openid && !openids.includes(partnerInfo.openid)) {
+      openids.push(partnerInfo.openid)
+    }
+
+    return openids
   },
 
   // 用户授权后更新用户信息
@@ -76,6 +129,10 @@ App({
         // 通知所有等待用户信息的页面
         if (this.userInfoReadyCallback) {
           this.userInfoReadyCallback(res.result.userInfo)
+        }
+        if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
+          this.userInfoReadyCallbacks.forEach(callback => callback(res.result.userInfo))
+          this.userInfoReadyCallbacks = []
         }
         return true
       }

@@ -1,5 +1,6 @@
 // pages/menu/menu.js
 const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
 
 Page({
   data: {
@@ -11,9 +12,12 @@ Page({
     filteredDishes: [],
     cart: {},
     totalCount: 0,
+    isFirstLoad: true, // 标记是否首次加载
   },
 
   async onLoad() {
+    await app.waitForUserInfo()
+    await app.loadPartnerInfo()
     // 串行加载，确保分类先加载完成
     await this.loadCategories()
     await this.loadDishes()
@@ -26,9 +30,27 @@ Page({
   async loadCategories() {
     try {
       const db = wx.cloud.database()
-      const { data: categories } = await db.collection('categories')
+      const _ = db.command
+      const openids = await app.getCoupleOpenIds()
+      console.log('菜单页-加载分类, openids:', openids)
+
+      if (openids.length === 0) {
+        this.setData({ categories: [], activeCategory: '' })
+        return
+      }
+      const whereCondition = { _openid: _.in(openids) }
+
+      const categories = await fetchAll((skip, limit) => db.collection('categories')
+        .where(whereCondition)
         .orderBy('sort', 'asc')
-        .get()
+        .skip(skip)
+        .limit(limit)
+        .get())
+
+      console.log('菜单页-加载到的分类数量:', categories.length)
+      if (categories.length > 0) {
+        console.log('菜单页-分类列表:', categories.map(c => ({ name: c.name, id: c._id, openid: c._openid })))
+      }
 
       if (categories && categories.length > 0) {
         this.setData({
@@ -48,8 +70,26 @@ Page({
   async loadDishes() {
     try {
       const db = wx.cloud.database()
-      const { data: dishes } = await db.collection('dishes')
-        .get()
+      const _ = db.command
+      const openids = await app.getCoupleOpenIds()
+      console.log('菜单页-加载菜品, openids:', openids)
+
+      if (openids.length === 0) {
+        this.setData({ allDishes: [], filteredDishes: [] })
+        return
+      }
+      const whereCondition = { _openid: _.in(openids) }
+
+      const dishes = await fetchAll((skip, limit) => db.collection('dishes')
+        .where(whereCondition)
+        .skip(skip)
+        .limit(limit)
+        .get())
+
+      console.log('菜单页-加载到的菜品数量:', dishes.length)
+      if (dishes.length > 0) {
+        console.log('菜单页-前3道菜品:', dishes.slice(0, 3).map(d => ({ name: d.name, categoryId: d.categoryId, openid: d._openid })))
+      }
 
       this.setData({ allDishes: dishes })
 
@@ -64,17 +104,32 @@ Page({
     }
   },
 
-  onShow() {
+  async onShow() {
+    // 首次加载时跳过（onLoad 已经加载过了）
+    if (this.data.isFirstLoad) {
+      this.setData({ isFirstLoad: false })
+      this._checkTodayChef()
+      return
+    }
+
+    // 非首次进入时重新加载数据（从其他页面返回时）
+    await this.loadCategories()
+    await this.loadDishes()
+    if (this.data.categories.length > 0 && this.data.allDishes.length > 0) {
+      this.filterDishes()
+    }
     this._checkTodayChef()
   },
 
   async _checkTodayChef() {
     try {
       const db = wx.cloud.database()
-      const userInfo = app.globalData.userInfo
-      const partnerInfo = app.globalData.partnerInfo
+      const _ = db.command
+      const userInfo = await app.waitForUserInfo()
+      const partnerInfo = await app.loadPartnerInfo()
+      const openids = await app.getCoupleOpenIds()
 
-      if (!userInfo || !partnerInfo) {
+      if (!userInfo || !partnerInfo || openids.length === 0) {
         this.setData({ chefName: '待定' })
         return
       }
@@ -87,7 +142,8 @@ Page({
 
       const { data: orders } = await db.collection('orders')
         .where({
-          createdAt: db.command.gte(today).and(db.command.lt(tomorrow))
+          _openid: _.in(openids),
+          createdAt: _.gte(today).and(_.lt(tomorrow))
         })
         .orderBy('createdAt', 'desc')
         .limit(1)
@@ -135,7 +191,7 @@ Page({
     wx.vibrateShort({ type: 'light' })
     const { id, delta } = e.currentTarget.dataset
     const { cart } = this.data
-    const newCount = (cart[id] || 0) + parseInt(delta)
+    const newCount = (cart[id] || 0) + Number(delta)
 
     if (newCount <= 0) {
       delete cart[id]
@@ -147,16 +203,19 @@ Page({
     this.setData({ cart, totalCount })
 
     // 同步到全局
-    app.globalData.cart = Object.entries(cart).map(([dishId, count]) => {
-      const dish = this.data.allDishes.find(d => d._id == dishId)
-      return {
-        dishId,
-        name: dish.name,
-        count,
-        emoji: dish.emoji,
-        image: dish.image  // 修复：添加 image 字段
-      }
-    })
+    app.globalData.cart = Object.entries(cart)
+      .map(([dishId, count]) => {
+        const dish = this.data.allDishes.find(d => d._id == dishId)
+        if (!dish) return null
+        return {
+          dishId,
+          name: dish.name,
+          count,
+          emoji: dish.emoji,
+          image: dish.image
+        }
+      })
+      .filter(Boolean)
 
     // 持久化到本地存储
     wx.setStorageSync('cart', app.globalData.cart)

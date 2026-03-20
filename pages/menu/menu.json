@@ -1,6 +1,3 @@
 {
-  "navigationBarTitleText": "菜单",
-  "usingComponents": {
-    "dish-card": "../../components/dish-card/dish-card"
-  }
+  "navigationBarTitleText": "菜单"
 }

@@ -1,6 +1,3 @@
 {
-  "navigationBarTitleText": "食分爱",
-  "usingComponents": {
-    "avatar-pair": "../../components/avatar-pair/avatar-pair"
-  }
+  "navigationBarTitleText": "食分爱"
 }

@@ -101,9 +101,9 @@ exports.main = async (event, context) => {
     }
 
     const { _id } = await db.collection('users').add({ data: newUser })
-    newUser._id = _id
 
-    return { success: true, userInfo: newUser }
+    const { data: createdUser } = await db.collection('users').doc(_id).get()
+    return { success: true, userInfo: createdUser }
   } catch (err) {
     console.error('login error', err)
     return { success: false, error: err.message }

@@ -9,7 +9,7 @@ exports.main = async (event, context) => {
   const myOpenid = wxContext.OPENID
   const { partnerCode, action } = event
 
-  if (!partnerCode && action !== 'accept' && action !== 'reject') {
+  if (!partnerCode && action !== 'accept' && action !== 'reject' && action !== 'unbind') {
     return { success: false, error: '识别码不能为空' }
   }
 
@@ -24,6 +24,24 @@ exports.main = async (event, context) => {
     }
 
     const me = myUsers[0]
+
+    // 处理解绑请求
+    if (action === 'unbind') {
+      if (!me.partnerId) {
+        return { success: false, error: '当前未绑定伙伴' }
+      }
+
+      const partnerId = me.partnerId
+      await db.collection('users').doc(me._id).update({
+        data: { partnerId: null }
+      })
+
+      await db.collection('users').doc(partnerId).update({
+        data: { partnerId: null }
+      })
+
+      return { success: true, message: '已解绑' }
+    }
 
     // 处理接受/拒绝绑定请求
     if (action === 'accept' || action === 'reject') {
@@ -45,6 +63,18 @@ exports.main = async (event, context) => {
       const request = requests[0]
 
       if (action === 'accept') {
+        if (me.partnerId) {
+          return { success: false, error: '你已经绑定了伙伴' }
+        }
+
+        const { data: fromUser } = await db.collection('users').doc(request.fromId).get()
+        if (!fromUser) {
+          return { success: false, error: '发起者不存在' }
+        }
+        if (fromUser.partnerId) {
+          return { success: false, error: '对方已经绑定了伙伴' }
+        }
+
         // 接受绑定：双向绑定
         await db.collection('users').doc(me._id).update({
           data: { partnerId: request.fromId }
@@ -56,9 +86,6 @@ exports.main = async (event, context) => {
 
         // 删除绑定请求
         await db.collection('bind_requests').doc(requestId).remove()
-
-        // 获取对方信息
-        const { data: fromUser } = await db.collection('users').doc(request.fromId).get()
 
         return { success: true, partnerInfo: fromUser, message: '绑定成功！' }
       } else {

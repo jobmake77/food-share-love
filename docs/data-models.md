@@ -102,7 +102,27 @@
 
 ---
 
-### 5. reviews（评价集合）
+### 5. feedbacks（反馈集合）
+
+用户反馈信息（由云函数写入）。
+
+```javascript
+{
+  _id: String,              // 反馈ID（自动生成）
+  _openid: String,          // 提交者 openid（自动添加）
+  content: String,          // 反馈内容
+  contact: String,          // 联系方式（可选）
+  userOpenid: String,       // 用户 openid（冗余）
+  userName: String,         // 用户昵称
+  userAvatar: String,       // 用户头像
+  createdAt: Date,          // 创建时间
+  status: String            // 状态：pending/replied/closed
+}
+```
+
+---
+
+### 6. reviews（评价集合）
 
 **注意**：当前版本中，评价数据直接存储在 orders 集合的 `rating` 和 `review` 字段中，暂未使用独立的 reviews 集合。
 

@@ -203,23 +203,103 @@
 }
 
 /* 未绑定状态 */
-.bind-btn {
+.bind-form {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16rpx;
-  padding: 24rpx;
-  background: var(--color-secondary);
-  border-radius: var(--radius-md);
-  font-size: 28rpx;
-  color: var(--color-text-hint);
-  transition: all 0.3s ease;
+  flex-direction: column;
+  gap: 20rpx;
 }
 
-.bind-btn:active {
-  background: rgba(242, 125, 94, 0.1);
-  color: var(--color-primary);
+.bind-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.bind-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  border-radius: var(--radius-md);
+  background: var(--color-secondary);
+  font-size: 24rpx;
+  color: var(--color-text-primary);
+}
+
+.bind-action {
+  padding: 16rpx 24rpx;
+  border-radius: 40rpx;
+  background: var(--color-secondary);
+  color: var(--color-text-primary);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.bind-action:active {
+  transform: scale(0.96);
+}
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  background: rgba(242, 125, 94, 0.06);
+  border-radius: var(--radius-md);
+  padding: 16rpx;
+}
+
+.pending-title {
+  font-size: 22rpx;
+  color: var(--color-text-hint);
+}
+
+.pending-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 16rpx;
+}
+
+.pending-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.pending-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.pending-code {
+  font-size: 20rpx;
+  color: var(--color-text-hint);
+}
+
+.pending-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.pending-btn {
+  padding: 10rpx 20rpx;
+  border-radius: 32rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.pending-btn.accept {
+  background: rgba(76, 175, 80, 0.12);
+  color: #4caf50;
+}
+
+.pending-btn.reject {
+  background: rgba(255, 68, 68, 0.12);
+  color: #ff4444;
 }
 
 /* ========== 设置列表 ========== */

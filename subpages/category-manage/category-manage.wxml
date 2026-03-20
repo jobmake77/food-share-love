@@ -47,7 +47,7 @@
     </view>
     <view class="action-item" bindtap="goToDataManage">
       <text class="action-icon">📋</text>
-      <text class="action-text">数据管理</text>
+      <text class="action-text">官方菜单</text>
     </view>
   </view>
 

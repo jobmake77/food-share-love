@@ -1,5 +1,6 @@
 // pages/order/order.js
 const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
 
 Page({
   data: {
@@ -29,24 +30,23 @@ Page({
       const db = wx.cloud.database()
       const _ = db.command
 
-      // 获取当前用户信息
-      const userInfo = app.globalData.userInfo
-      const partnerInfo = app.globalData.partnerInfo
+      await app.waitForUserInfo()
+      await app.loadPartnerInfo()
 
-      // 构建查询条件：只查询当前用户和伴侣的订单
-      let whereCondition = {}
-      if (userInfo && partnerInfo) {
-        // 如果有伴侣，查询两人的订单
-        whereCondition = {
-          _openid: _.in([userInfo._openid, partnerInfo._openid].filter(Boolean))
-        }
+      const openids = await app.getCoupleOpenIds()
+      if (openids.length === 0) {
+        this.setData({ orders: [], filteredOrders: [] })
+        return
       }
-      // 如果没有伴侣信息，默认只查询当前用户的订单（通过 _openid 自动过滤）
 
-      const { data } = await db.collection('orders')
+      const whereCondition = { _openid: _.in(openids) }
+
+      const data = await fetchAll((skip, limit) => db.collection('orders')
         .where(whereCondition)
         .orderBy('createdAt', 'desc')
-        .get()
+        .skip(skip)
+        .limit(limit)
+        .get())
 
       // 格式化订单数据
       const formattedOrders = data.map(order => ({

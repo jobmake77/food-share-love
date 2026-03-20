@@ -1,6 +1,8 @@
 {
   "navigationBarTitleText": "菜品管理",
+  "navigationBarBackgroundColor": "#F27D5E",
+  "navigationBarTextStyle": "white",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#f5f5f5",
+  "backgroundColor": "#FFFCF5",
   "backgroundTextStyle": "dark"
 }

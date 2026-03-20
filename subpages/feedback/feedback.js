@@ -2,7 +2,6 @@
 Page({
   data: {
     content: '',
-    contact: '',
     submitting: false,
   },
 
@@ -10,12 +9,8 @@ Page({
     this.setData({ content: e.detail.value })
   },
 
-  onContactInput(e) {
-    this.setData({ contact: e.detail.value })
-  },
-
   async submitFeedback() {
-    const { content, contact } = this.data
+    const { content } = this.data
 
     if (!content.trim()) {
       wx.showToast({
@@ -32,8 +27,7 @@ Page({
       const res = await wx.cloud.callFunction({
         name: 'sendFeedback',
         data: {
-          content: content.trim(),
-          contact: contact.trim()
+          content: content.trim()
         }
       })
 

@@ -1,5 +1,6 @@
 // pages/home/home.js
 const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
 
 Page({
   data: {
@@ -20,11 +21,11 @@ Page({
   onLoad() {
     this._setGreeting()
     this._generateRecommendations()
-    this.loadStats()
   },
 
   onShow() {
     this._loadData()
+    this.loadStats()
   },
 
   _setGreeting() {
@@ -37,29 +38,17 @@ Page({
   },
 
   async _loadData() {
-    const db = wx.cloud.database()
-    const userInfo = app.globalData.userInfo
-    if (!userInfo) {
-      // 等待登录完成
-      app.userInfoReadyCallback = (info) => {
-        this._loadData()
-      }
-      return
-    }
+    const userInfo = await app.waitForUserInfo()
+    if (!userInfo) return
 
     // 检查是否需要授权（昵称为默认值或以"用户"开头，且头像为空）
     const needAuth = (userInfo.nickname === '美食爱好者' || userInfo.nickname.startsWith('用户')) && !userInfo.avatar
     this.setData({ userInfo, loaded: true, needAuth })
 
     // 加载伙伴信息
-    if (userInfo.partnerId) {
-      try {
-        const { data } = await db.collection('users').doc(userInfo.partnerId).get()
-        app.globalData.partnerInfo = data
-        this.setData({ partnerInfo: data })
-      } catch (e) {
-        console.error('获取伙伴信息失败', e)
-      }
+    const partnerInfo = await app.loadPartnerInfo()
+    if (partnerInfo) {
+      this.setData({ partnerInfo })
     }
   },
 
@@ -136,31 +125,43 @@ Page({
 
   // 加载伙伴信息
   async _loadPartnerInfo() {
-    const userInfo = app.globalData.userInfo
-    if (userInfo && userInfo.partnerId) {
-      try {
-        const db = wx.cloud.database()
-        const { data } = await db.collection('users').doc(userInfo.partnerId).get()
-        app.globalData.partnerInfo = data
-        this.setData({ partnerInfo: data })
-      } catch (e) {
-        console.error('获取伙伴信息失败', e)
-      }
+    const partnerInfo = await app.loadPartnerInfo()
+    if (partnerInfo) {
+      this.setData({ partnerInfo })
     }
   },
 
   async loadStats() {
     try {
       const db = wx.cloud.database()
+      const _ = db.command
+      const openids = await app.getCoupleOpenIds()
+      if (openids.length === 0) {
+        this.setData({
+          stats: {
+            totalDishes: 0,
+            totalOrders: 0,
+            daysUsed: 0
+          }
+        })
+        return
+      }
 
-      // 统计菜品总数
-      const dishesCount = await db.collection('dishes').count()
+      const whereCondition = { _openid: _.in(openids) }
 
-      // 统计订单总数
-      const ordersCount = await db.collection('orders').count()
+      // 统计菜品总数（仅统计当前用户或伴侣）
+      const dishesCount = await db.collection('dishes')
+        .where(whereCondition)
+        .count()
+
+      // 统计订单总数（仅统计当前用户或伴侣）
+      const ordersCount = await db.collection('orders')
+        .where(whereCondition)
+        .count()
 
       // 计算使用天数（从第一个订单到现在）
       const { data: firstOrder } = await db.collection('orders')
+        .where(whereCondition)
         .orderBy('createdAt', 'asc')
         .limit(1)
         .get()
@@ -239,21 +240,29 @@ Page({
 
   // 生成今日推荐
   async _generateRecommendations() {
-    console.log('开始生成今日推荐...')
-
     try {
       // 检查云开发是否初始化
       if (!wx.cloud || !wx.cloud.database) {
-        console.log('云开发未初始化，使用 fallback 数据')
         this._useFallbackRecommendations()
         return
       }
 
       const db = wx.cloud.database()
+      const _ = db.command
+      const openids = await app.getCoupleOpenIds()
+      if (openids.length === 0) {
+        this._useFallbackRecommendations()
+        return
+      }
+      const whereCondition = { _openid: _.in(openids) }
 
       // 加载分类信息
-      const { data: categories } = await db.collection('categories').get()
-      console.log('数据库分类数量:', categories ? categories.length : 0)
+      const categories = await fetchAll((skip, limit) => db.collection('categories')
+        .where(whereCondition)
+        .orderBy('sort', 'asc')
+        .skip(skip)
+        .limit(limit)
+        .get())
 
       // 创建分类名称到ID的映射
       const categoryMap = {}
@@ -264,13 +273,11 @@ Page({
       }
 
       // 尝试从数据库获取菜品
-      const { data: allDishes } = await db.collection('dishes').get()
-      console.log('数据库菜品数量:', allDishes ? allDishes.length : 0)
-
-      // 查看第一道菜的数据结构
-      if (allDishes && allDishes.length > 0) {
-        console.log('第一道菜的数据结构:', allDishes[0])
-      }
+      const allDishes = await fetchAll((skip, limit) => db.collection('dishes')
+        .where(whereCondition)
+        .skip(skip)
+        .limit(limit)
+        .get())
 
       if (allDishes && allDishes.length > 0) {
         // 按类别分组（使用 categoryId 和分类名称映射）
@@ -297,14 +304,6 @@ Page({
             return catName === '主食' || catName === '快手菜' || catName === '家常菜'
           })
         }
-
-        console.log('分组结果:', {
-          meat: grouped.meat.length,
-          vegetable: grouped.vegetable.length,
-          soup: grouped.soup.length,
-          dessert: grouped.dessert.length,
-          others: grouped.others.length
-        })
 
         const recommendations = []
 
@@ -346,11 +345,9 @@ Page({
           }
         }
 
-        console.log('从数据库生成推荐:', recommendations.length, '道菜')
         this.setData({ recommendDishes: recommendations })
       } else {
         // 数据库为空，使用默认推荐
-        console.log('数据库为空，使用 fallback 数据')
         this._useFallbackRecommendations()
       }
     } catch (e) {
@@ -362,8 +359,6 @@ Page({
 
   // 使用默认推荐（从硬编码菜品中智能选择）
   _useFallbackRecommendations() {
-    console.log('使用 fallback 推荐数据')
-
     const fallbackDishes = [
       { id: 1, name: '番茄炒蛋', tag: '简单快手', emoji: '🍳', time: '15min', type: 'vegetable' },
       { id: 2, name: '红烧排骨', tag: '经典硬菜', emoji: '🍖', time: '45min', type: 'meat' },
@@ -401,7 +396,6 @@ Page({
       recommendations.push(this._randomPick(extras))
     }
 
-    console.log('Fallback 推荐结果:', recommendations)
     this.setData({ recommendDishes: recommendations })
   },
 

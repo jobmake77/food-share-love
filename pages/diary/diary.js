@@ -1,5 +1,6 @@
 // pages/diary/diary.js
 const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
 
 const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
 const weekDays = ['日', '一', '二', '三', '四', '五', '六']
@@ -40,12 +41,32 @@ Page({
     wx.showLoading({ title: '加载中...' })
     try {
       const db = wx.cloud.database()
+      const _ = db.command
+
+      await app.waitForUserInfo()
+      await app.loadPartnerInfo()
+      const openids = await app.getCoupleOpenIds()
+      if (openids.length === 0) {
+        this.setData({ diaryEntries: {} })
+        if (this.data.viewMode === 'week') {
+          this.renderWeekView()
+        } else {
+          this.renderCalendar()
+        }
+        this.loadSelectedEntry()
+        return
+      }
 
       // 获取所有已完成的订单
-      const { data: orders } = await db.collection('orders')
-        .where({ status: 'done' })
+      const orders = await fetchAll((skip, limit) => db.collection('orders')
+        .where({
+          _openid: _.in(openids),
+          status: 'done'
+        })
         .orderBy('createdAt', 'desc')
-        .get()
+        .skip(skip)
+        .limit(limit)
+        .get())
 
       // 转换为日记格式
       const diaryEntries = {}

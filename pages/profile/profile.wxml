@@ -50,9 +50,32 @@
     </view>
 
     <!-- 未绑定状态 -->
-    <view class="bind-btn" wx:else bindtap="bindPartner">
-      <text class="card-icon">👥</text>
-      <text>绑定伙伴</text>
+    <view class="bind-form" wx:else>
+      <view class="bind-input-row">
+        <input
+          class="bind-input"
+          placeholder="输入 TA 的识别码（如 LOVE-8F42B1）"
+          value="{{bindCodeInput}}"
+          bindinput="onBindCodeInput"
+        />
+        <view class="bind-action" bindtap="bindPartner">
+          <text>{{binding ? '发送中...' : '发送'}}</text>
+        </view>
+      </view>
+
+      <view class="pending-list" wx:if="{{pendingRequests.length > 0}}">
+        <view class="pending-title">待确认请求</view>
+        <view class="pending-item" wx:for="{{pendingRequests}}" wx:key="_id">
+          <view class="pending-info">
+            <text class="pending-name">{{item.fromName || '未知用户'}}</text>
+            <text class="pending-code">请求绑定</text>
+          </view>
+          <view class="pending-actions">
+            <view class="pending-btn accept" data-id="{{item._id}}" bindtap="acceptBindRequest">接受</view>
+            <view class="pending-btn reject" data-id="{{item._id}}" bindtap="rejectBindRequest">拒绝</view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 

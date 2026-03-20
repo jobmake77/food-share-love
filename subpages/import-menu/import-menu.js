@@ -1,4 +1,6 @@
 // subpages/import-menu/import-menu.js
+const app = getApp()
+
 Page({
   data: {
     jsonText: '',
@@ -22,6 +24,7 @@ Page({
       return
     }
 
+    await app.waitForUserInfo()
     this.setData({ importing: true })
     const db = wx.cloud.database()
 
@@ -37,11 +40,23 @@ Page({
 
       wx.showLoading({ title: '导入中...' })
 
-      // 导入分类
+      // 导入分类（并建立旧ID/名称映射）
+      const categoryIdMap = {}
+      const categoryNameMap = {}
+      let defaultCategoryId = ''
       let categoryCount = 0
       for (const cat of importData.categories) {
         const { _id, ...catData } = cat
-        await db.collection('categories').add({ data: catData })
+        const normalizedName = (catData.name || '').trim()
+        const insertData = {
+          ...catData,
+          name: normalizedName || '未命名分类',
+          sort: typeof catData.sort === 'number' ? catData.sort : categoryCount + 1
+        }
+        const addRes = await db.collection('categories').add({ data: insertData })
+        if (_id) categoryIdMap[_id] = addRes._id
+        if (normalizedName) categoryNameMap[normalizedName] = addRes._id
+        if (!defaultCategoryId) defaultCategoryId = addRes._id
         categoryCount++
       }
 
@@ -49,7 +64,25 @@ Page({
       let dishCount = 0
       for (const dish of importData.dishes) {
         const { _id, ...dishData } = dish
-        await db.collection('dishes').add({ data: dishData })
+        let categoryId = ''
+        if (dishData.categoryId && categoryIdMap[dishData.categoryId]) {
+          categoryId = categoryIdMap[dishData.categoryId]
+        } else if (dishData.categoryName && categoryNameMap[dishData.categoryName]) {
+          categoryId = categoryNameMap[dishData.categoryName]
+        } else if (dishData.category && categoryNameMap[dishData.category]) {
+          categoryId = categoryNameMap[dishData.category]
+        }
+
+        const insertDish = {
+          ...dishData,
+          categoryId: categoryId || defaultCategoryId,
+          name: (dishData.name || '').trim(),
+          desc: dishData.desc || '',
+          image: dishData.image || '',
+          emoji: dishData.emoji || '🍽️',
+          sort: typeof dishData.sort === 'number' ? dishData.sort : Date.now()
+        }
+        await db.collection('dishes').add({ data: insertDish })
         dishCount++
       }
 

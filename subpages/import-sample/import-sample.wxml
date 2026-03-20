@@ -1,9 +1,25 @@
 <!--subpages/import-sample/import-sample.wxml-->
 <view class="container">
   <view class="header">
-    <text class="icon">📋</text>
-    <text class="title">导入示例菜单</text>
-    <text class="subtitle">快速开始使用小程序</text>
+    <text class="icon">📚</text>
+    <text class="title">官方菜单</text>
+    <text class="subtitle">选择口味包，一键导入到你的菜单管理</text>
+  </view>
+
+  <view class="pack-list">
+    <view
+      class="pack-item {{selectedPackId === item.id ? 'active' : ''}}"
+      wx:for="{{menuPacks}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onSelectPack"
+    >
+      <view class="pack-top">
+        <text class="pack-name">{{item.name}}</text>
+        <text class="pack-badge">{{item.categories}}类 · {{item.dishes}}条</text>
+      </view>
+      <text class="pack-tagline">{{item.tagline}}</text>
+    </view>
   </view>
 
   <view class="stats">
@@ -21,17 +37,13 @@
   <view class="preview">
     <view class="preview-title">包含内容</view>
     <view class="preview-list">
-      <view class="preview-item">🍚 主食：米饭、炒饭、面条</view>
-      <view class="preview-item">🍖 荤菜：红烧肉、糖醋排骨、宫保鸡丁等</view>
-      <view class="preview-item">🥬 素菜：番茄炒蛋、麻婆豆腐、地三鲜等</view>
-      <view class="preview-item">🍲 汤品：西红柿蛋汤、紫菜蛋花汤等</view>
-      <view class="preview-item">🍰 甜品：水果拼盘、红豆沙、冰淇淋</view>
+      <view class="preview-item" wx:for="{{preview}}" wx:key="*this">{{item}}</view>
     </view>
   </view>
 
   <view class="tips">
     <text class="tips-icon">💡</text>
-    <text class="tips-text">导入后可以在菜单管理中编辑或删除</text>
+    <text class="tips-text">导入后可在菜单管理中继续编辑、增删或再导入其他口味</text>
   </view>
 
   <button
@@ -41,7 +53,7 @@
     loading="{{importing}}"
     disabled="{{importing || clearing}}"
   >
-    {{importing ? '导入中...' : '一键导入'}}
+    {{importing ? '导入中...' : '导入当前官方菜单'}}
   </button>
 
   <button

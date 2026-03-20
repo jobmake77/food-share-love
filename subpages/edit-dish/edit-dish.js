@@ -1,5 +1,6 @@
 // subpages/edit-dish/edit-dish.js
 const app = getApp()
+const { fetchAll } = require('../../utils/db.js')
 
 Page({
   data: {
@@ -43,7 +44,18 @@ Page({
   async _loadCategories() {
     const db = wx.cloud.database()
     try {
-      const { data } = await db.collection('categories').orderBy('sort', 'asc').get()
+      const _ = db.command
+      const openids = await app.getCoupleOpenIds()
+      if (openids.length === 0) {
+        this.setData({ categories: [{ _id: '', name: '未分类' }] })
+        return
+      }
+      const data = await fetchAll((skip, limit) => db.collection('categories')
+        .where({ _openid: _.in(openids) })
+        .orderBy('sort', 'asc')
+        .skip(skip)
+        .limit(limit)
+        .get())
       this.setData({ categories: data.length > 0 ? data : [{ _id: '', name: '未分类' }] })
     } catch (e) {
       console.error('加载分类失败', e)

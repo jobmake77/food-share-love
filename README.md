@@ -22,7 +22,7 @@
 ### 特色亮点
 - 💡 **角色权限**：点单者评价，做饭者完成，分工明确
 - 🎯 **智能推荐**：基于菜品分类的营养均衡推荐算法
-- 📥 **快速导入**：一键导入示例菜单，快速上手
+- 📥 **官方菜单**：支持一键导入北方/南方/情侣卡菜单包
 - 🎨 **精美设计**：粉橙渐变色调，圆角卡片，温馨浪漫
 - 🚀 **性能优化**：数据缓存、页面预加载、即时反馈
 - ⚙️ **个性设置**：支持修改头像、昵称，意见反馈
@@ -51,7 +51,7 @@
 - **框架**：微信小程序原生开发（WXML + WXSS + JavaScript）
 - **后端**：微信云开发
   - 云数据库（存储用户、菜品、订单数据）
-  - 云函数（登录、绑定、删除等业务逻辑）
+  - 云函数（登录、绑定、删除、反馈等业务逻辑）
   - 云存储（图片上传）
 - **UI 设计**：粉橙渐变色调，圆角卡片，情侣主题
 - **性能优化**：数据缓存、页面预加载、震动反馈
@@ -68,7 +68,8 @@ food-share-love/
 ├── cloudfunctions/               # 云函数
 │   ├── login/                    # 登录/注册，生成识别码
 │   ├── bindPartner/              # 双向绑定伙伴
-│   └── deleteDish/               # 删除菜品（权限控制）
+│   ├── deleteDish/               # 删除菜品（权限控制）
+│   └── sendFeedback/             # 提交意见反馈
 ├── pages/                        # 主包页面
 │   ├── home/                     # 首页
 │   ├── menu/                     # 菜单页
@@ -84,7 +85,7 @@ food-share-love/
 │   ├── feedback/                 # 意见反馈
 │   ├── settings/                 # 个人设置
 │   ├── category-manage/          # 分类管理
-│   ├── import-sample/            # 导入示例菜单
+│   ├── import-sample/            # 官方菜单导入
 │   └── import-menu/              # 导入自定义菜单
 ├── components/                   # 自定义组件
 │   ├── avatar-pair/              # 情侣头像组件
@@ -106,17 +107,17 @@ food-share-love/
 
 | 集合名 | 核心字段 | 说明 |
 |--------|---------|------|
-| `users` | openid, nickname, avatar, code, partnerId, isTestAccount | 用户信息，识别码用于绑定 |
+| `users` | openid, nickname, avatar, phone, code, partnerId | 用户信息，识别码用于绑定 |
 | `categories` | name, icon, sort | 菜品分类 |
 | `dishes` | name, desc, image, emoji, category, categoryId, sort | 菜品信息（支持图片和Emoji，category: meat/vegetable/soup/dessert） |
 | `orders` | dishes[], note, status, orderedBy, creatorName, creatorAvatar, partnerId, createdAt, doneAt | 订单记录（status: cooking/done） |
-| `reviews` | orderId, rating, comment, createdAt | 订单评价 |
+| `bind_requests` | fromId, targetId, createdAt, status | 绑定请求，支持确认/拒绝流程 |
 | `feedbacks` | content, contact, userOpenid, userName, userAvatar, createdAt, status | 用户反馈 |
 
 ### 权限设置建议
 - `users`：所有用户可读，仅创建者可写
-- `categories`、`dishes`：所有用户可读写（情侣共享）
-- `orders`、`reviews`：所有用户可读写
+- `categories`、`dishes`：所有用户可读，仅创建者可写
+- `orders`、`feedbacks`、`bind_requests`：仅创建者可读写
 
 ---
 
@@ -144,6 +145,7 @@ wx.cloud.init({
 2. 右键 `cloudfunctions/login` → 上传并部署
 3. 右键 `cloudfunctions/bindPartner` → 上传并部署
 4. 右键 `cloudfunctions/deleteDish` → 上传并部署
+5. 右键 `cloudfunctions/sendFeedback` → 上传并部署
 
 ### 4. 配置数据库
 在云开发控制台创建以下集合：
@@ -151,7 +153,8 @@ wx.cloud.init({
 - `categories`
 - `dishes`
 - `orders`
-- `reviews`
+- `bind_requests`
+- `feedbacks`
 
 ### 5. 运行项目
 1. 在微信开发者工具中打开项目
@@ -165,7 +168,7 @@ wx.cloud.init({
 ### 首次使用
 1. 打开小程序，自动登录并生成识别码
 2. 设置昵称和头像
-3. 导入示例菜单（可选）
+3. 从「官方菜单」导入口味包（可选）
 4. 与伙伴交换识别码并绑定
 
 ### 点单流程
@@ -185,12 +188,6 @@ wx.cloud.init({
 
 ## 🧪 测试指南
 
-### 单账号测试
-使用"创建测试伙伴"功能：
-1. 进入"我的"页面
-2. 点击"创建测试伙伴账号"
-3. 自动完成绑定，可以测试完整流程
-
 ### 双账号测试
 发布体验版进行测试：
 1. 上传代码到微信公众平台
@@ -207,7 +204,7 @@ wx.cloud.init({
 - **AppID**：见 `project.config.json`
 - **云环境 ID**：见 `app.js` → `wx.cloud.init({ env: '...' })`
 - **基础库要求**：>= 2.2.3（云开发必须）
-- **开发模式开关**：`pages/profile/profile.js` → `showDevMode`（上线前改为 `false`）
+- **正式发布检查清单**：见 `docs/正式发布前检查清单.md`
 
 ---
 
@@ -263,6 +260,7 @@ wx.cloud.init({
 
 - [双账号测试指南](./docs/双账号测试指南.md)
 - [发布体验版指南](./docs/发布体验版指南.md)
+- [正式发布前检查清单](./docs/正式发布前检查清单.md)
 
 ---
 

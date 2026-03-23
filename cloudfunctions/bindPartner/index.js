@@ -40,7 +40,8 @@ exports.main = async (event, context) => {
         data: { partnerId: null }
       })
 
-      return { success: true, message: '已解绑' }
+      const { data: latestMe } = await db.collection('users').doc(me._id).get()
+      return { success: true, message: '已解绑', userInfo: latestMe }
     }
 
     // 处理接受/拒绝绑定请求
@@ -87,7 +88,15 @@ exports.main = async (event, context) => {
         // 删除绑定请求
         await db.collection('bind_requests').doc(requestId).remove()
 
-        return { success: true, partnerInfo: fromUser, message: '绑定成功！' }
+        const { data: latestMe } = await db.collection('users').doc(me._id).get()
+        const { data: latestPartner } = await db.collection('users').doc(request.fromId).get()
+
+        return {
+          success: true,
+          userInfo: latestMe,
+          partnerInfo: latestPartner,
+          message: '绑定成功！'
+        }
       } else {
         // 拒绝绑定：删除请求
         await db.collection('bind_requests').doc(requestId).remove()

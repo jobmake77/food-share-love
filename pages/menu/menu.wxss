@@ -78,6 +78,20 @@
   height: 100%;
 }
 
+.manage-hint {
+  margin: 0 40rpx 24rpx;
+  padding: 20rpx 24rpx;
+  background: var(--color-card);
+  border: 2rpx dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.manage-hint-text {
+  font-size: 22rpx;
+  color: var(--color-text-hint);
+  line-height: 1.6;
+}
+
 /* ========== 双栏布局 ========== */
 .menu-body {
   flex: 1;

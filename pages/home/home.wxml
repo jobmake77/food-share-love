@@ -81,7 +81,7 @@
     </view>
 
     <!-- 今日推荐 -->
-    <view class="recommend-section">
+    <view class="recommend-section" wx:if="{{recommendDishes.length > 0}}">
       <view class="section-header">
         <view class="section-title">今日推荐</view>
         <view class="section-more" bindtap="goMenu">查看更多 →</view>
@@ -99,6 +99,11 @@
           <view class="dish-add-btn" bindtap="addDish" data-id="{{item.id}}">+</view>
         </view>
       </view>
+    </view>
+
+    <view class="recommend-empty" wx:else>
+      <text class="recommend-empty-title">还没有可推荐的菜品</text>
+      <text class="recommend-empty-text">先到「我的 → 菜单管理」添加菜品，首页会自动为你推荐</text>
     </view>
 
     <!-- 爱情统计 -->

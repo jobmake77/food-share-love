@@ -20,12 +20,13 @@ Page({
 
   onLoad() {
     this._setGreeting()
-    this._generateRecommendations()
   },
 
-  onShow() {
+  async onShow() {
+    await app.refreshUserInfo()
     this._loadData()
     this.loadStats()
+    this._generateRecommendations()
   },
 
   _setGreeting() {
@@ -243,7 +244,7 @@ Page({
     try {
       // 检查云开发是否初始化
       if (!wx.cloud || !wx.cloud.database) {
-        this._useFallbackRecommendations()
+        this.setData({ recommendDishes: [] })
         return
       }
 
@@ -251,7 +252,7 @@ Page({
       const _ = db.command
       const openids = await app.getCoupleOpenIds()
       if (openids.length === 0) {
-        this._useFallbackRecommendations()
+        this.setData({ recommendDishes: [] })
         return
       }
       const whereCondition = { _openid: _.in(openids) }
@@ -347,13 +348,12 @@ Page({
 
         this.setData({ recommendDishes: recommendations })
       } else {
-        // 数据库为空，使用默认推荐
-        this._useFallbackRecommendations()
+        // 数据库无菜品时不展示推荐
+        this.setData({ recommendDishes: [] })
       }
     } catch (e) {
       console.error('生成推荐失败:', e)
-      // 数据库查询失败，使用默认推荐
-      this._useFallbackRecommendations()
+      this.setData({ recommendDishes: [] })
     }
   },
 

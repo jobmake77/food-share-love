@@ -16,6 +16,7 @@ Page({
   },
 
   async onLoad() {
+    await app.refreshUserInfo()
     await app.waitForUserInfo()
     await app.loadPartnerInfo()
     // 串行加载，确保分类先加载完成
@@ -105,6 +106,7 @@ Page({
   },
 
   async onShow() {
+    await app.refreshUserInfo()
     // 首次加载时跳过（onLoad 已经加载过了）
     if (this.data.isFirstLoad) {
       this.setData({ isFirstLoad: false })

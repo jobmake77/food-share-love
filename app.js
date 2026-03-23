@@ -68,6 +68,34 @@ App({
     })
   },
 
+  async refreshUserInfo() {
+    try {
+      const prevPartnerId = this.globalData.userInfo?.partnerId || null
+      const res = await wx.cloud.callFunction({
+        name: 'login'
+      })
+
+      if (res.result && res.result.success && res.result.userInfo) {
+        this.globalData.userInfo = res.result.userInfo
+        this.globalData.originalUserInfo = res.result.userInfo
+
+        // 绑定关系变化时，清空伙伴缓存，避免展示旧状态
+        if (prevPartnerId !== (res.result.userInfo.partnerId || null)) {
+          this.globalData.partnerInfo = null
+        }
+
+        if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
+          this.userInfoReadyCallbacks.forEach(callback => callback(res.result.userInfo))
+          this.userInfoReadyCallbacks = []
+        }
+      }
+    } catch (err) {
+      console.error('刷新用户信息失败', err)
+    }
+
+    return this.globalData.userInfo
+  },
+
   async loadPartnerInfo() {
     const userInfo = await this.waitForUserInfo()
     if (!userInfo || !userInfo.partnerId) {

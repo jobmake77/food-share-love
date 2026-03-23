@@ -318,6 +318,29 @@
   gap: 20rpx;
 }
 
+.recommend-empty {
+  margin: 0 40rpx 48rpx;
+  padding: 28rpx;
+  background: var(--color-card);
+  border: 2rpx dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.recommend-empty-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8rpx;
+}
+
+.recommend-empty-text {
+  display: block;
+  font-size: 22rpx;
+  color: var(--color-text-hint);
+  line-height: 1.6;
+}
+
 .recommend-item {
   display: flex;
   align-items: center;

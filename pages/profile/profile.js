@@ -39,6 +39,7 @@ Page({
   },
 
   async loadProfileData() {
+    await app.refreshUserInfo()
     const userInfo = await app.waitForUserInfo()
     if (!userInfo) return
 
@@ -117,7 +118,10 @@ Page({
           wx.hideLoading()
           if (result.result && result.result.success) {
             app.globalData.partnerInfo = null
-            if (app.globalData.userInfo) {
+            if (result.result.userInfo) {
+              app.globalData.userInfo = result.result.userInfo
+              app.globalData.originalUserInfo = result.result.userInfo
+            } else if (app.globalData.userInfo) {
               app.globalData.userInfo.partnerId = null
             }
             this.setData({
@@ -190,7 +194,10 @@ Page({
 
       if (res.result && res.result.success) {
         app.globalData.partnerInfo = res.result.partnerInfo || null
-        if (app.globalData.userInfo) {
+        if (res.result.userInfo) {
+          app.globalData.userInfo = res.result.userInfo
+          app.globalData.originalUserInfo = res.result.userInfo
+        } else if (app.globalData.userInfo) {
           app.globalData.userInfo.partnerId = res.result.partnerInfo ? res.result.partnerInfo._id : null
         }
         this.setData({

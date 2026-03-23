@@ -24,6 +24,10 @@
     </view>
   </view>
 
+  <view class="manage-hint" wx:if="{{categories.length === 0 || allDishes.length === 0}}">
+    <text class="manage-hint-text">还没有菜单内容？请到「我的 → 菜单管理」添加或导入官方菜单</text>
+  </view>
+
   <!-- 双栏布局 -->
   <view class="menu-body">
     <!-- 左侧分类栏 -->

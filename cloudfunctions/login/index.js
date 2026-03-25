@@ -6,6 +6,16 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
 
+// 云函数内部查询伙伴信息（无客户端权限限制）
+async function _getPartner(partnerId) {
+  try {
+    const { data } = await db.collection('users').doc(partnerId).get()
+    return data || null
+  } catch (e) {
+    return null
+  }
+}
+
 // 生成随机6位识别码（使用密码学安全的随机数生成器）
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -65,15 +75,18 @@ exports.main = async (event, context) => {
           data: updateData
         })
 
-        // 返回更新后的用户信息
-        return {
-          success: true,
-          userInfo: { ...existingUser, ...updateData }
-        }
+        const updatedUser = { ...existingUser, ...updateData }
+        const partnerInfo = updatedUser.partnerId
+          ? await _getPartner(updatedUser.partnerId)
+          : null
+        return { success: true, userInfo: updatedUser, partnerInfo }
       }
 
-      // 没有新信息，直接返回现有用户
-      return { success: true, userInfo: existingUser }
+      // 没有新信息，直接返回现有用户（含伙伴信息）
+      const partnerInfo = existingUser.partnerId
+        ? await _getPartner(existingUser.partnerId)
+        : null
+      return { success: true, userInfo: existingUser, partnerInfo }
     }
 
     // 新用户，生成唯一识别码
@@ -103,7 +116,7 @@ exports.main = async (event, context) => {
     const { _id } = await db.collection('users').add({ data: newUser })
 
     const { data: createdUser } = await db.collection('users').doc(_id).get()
-    return { success: true, userInfo: createdUser }
+    return { success: true, userInfo: createdUser, partnerInfo: null }
   } catch (err) {
     console.error('login error', err)
     return { success: false, error: err.message }

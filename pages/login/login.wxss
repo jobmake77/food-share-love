@@ -1,0 +1,143 @@
+/* pages/login/login.wxss */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, var(--color-secondary) 0%, var(--color-bg) 40%, var(--color-bg) 100%);
+  padding: 40rpx 48rpx 48rpx;
+  box-sizing: border-box;
+}
+
+/* ========== 顶部品牌 ========== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding-top: 24rpx;
+}
+
+.heart-icon {
+  font-size: 28rpx;
+  color: var(--color-accent);
+}
+
+.brand-text {
+  font-size: 20rpx;
+  color: var(--color-text-hint);
+  letter-spacing: 6rpx;
+  font-weight: 500;
+}
+
+/* ========== 主内容区 ========== */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 600rpx;
+}
+
+/* 插图 */
+.illustration {
+  width: 480rpx;
+  height: 360rpx;
+  margin-bottom: 48rpx;
+  filter: drop-shadow(0 8rpx 32rpx rgba(242, 125, 94, 0.15));
+}
+
+/* 标题 */
+.title-section {
+  text-align: center;
+  margin-bottom: 64rpx;
+}
+
+.main-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+.sub-title {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* ========== 微信登录按钮 ========== */
+.btn-wechat {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx 0;
+  border-radius: var(--radius-btn);
+  background: #07C160;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.35);
+  transition: all 0.2s ease;
+  margin-bottom: 32rpx;
+}
+
+.btn-wechat::after {
+  border: none;
+}
+
+.btn-wechat:active {
+  transform: scale(0.97);
+  box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.25);
+}
+
+.btn-wechat[disabled] {
+  opacity: 0.65;
+}
+
+.btn-inner {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.wechat-icon {
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.btn-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ========== 用户协议 ========== */
+.privacy-tip {
+  font-size: 20rpx;
+  color: var(--color-text-hint);
+  text-align: center;
+  line-height: 1.8;
+}
+
+.privacy-link {
+  color: var(--color-primary);
+}
+
+/* ========== 底部 ========== */
+.footer {
+  padding-bottom: 16rpx;
+}
+
+.footer-text {
+  font-size: 20rpx;
+  color: var(--color-text-hint);
+  opacity: 0.5;
+}

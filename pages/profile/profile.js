@@ -272,7 +272,9 @@ Page({
         if (res.confirm) {
           app.globalData.userInfo = null
           app.globalData.partnerInfo = null
-          wx.reLaunch({ url: '/pages/home/home' })
+          app.globalData.originalUserInfo = null
+          app.userInfoReadyCallbacks = []
+          wx.reLaunch({ url: '/pages/login/login' })
         }
       }
     })

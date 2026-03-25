@@ -1,0 +1,56 @@
+<!-- pages/login/login.wxml -->
+<view class="login-container">
+
+  <!-- 顶部品牌标识 -->
+  <view class="top-bar animate-fade-in-up">
+    <text class="heart-icon animate-pulse-heart">♥</text>
+    <text class="brand-text">FOOD SHARE LOVE</text>
+    <text class="heart-icon animate-pulse-heart delay-200">♥</text>
+  </view>
+
+  <!-- 中间主内容区 -->
+  <view class="main-area">
+
+    <!-- 插图 -->
+    <image
+      class="illustration animate-float"
+      src="/assets/login-illustration.png"
+      mode="aspectFit"
+    />
+
+    <!-- 标题 -->
+    <view class="title-section">
+      <text class="main-title">今天想吃什么？</text>
+      <text class="sub-title">记录每一次爱的味道 💕</text>
+    </view>
+
+    <!-- 微信登录按钮 -->
+    <button
+      class="btn-wechat"
+      bindtap="handleLogin"
+      disabled="{{loading}}"
+      loading="{{loading}}"
+    >
+      <view wx:if="{{!loading}}" class="btn-inner">
+        <image class="wechat-icon" src="/assets/icons/wechat.png" mode="aspectFit" />
+        <text class="btn-text">微信登录</text>
+      </view>
+      <text wx:else class="btn-text">登录中...</text>
+    </button>
+
+    <!-- 用户协议 -->
+    <view class="privacy-tip">
+      <text>登录即表示同意</text>
+      <text class="privacy-link" bindtap="showPrivacy"> 用户协议 </text>
+      <text>和</text>
+      <text class="privacy-link" bindtap="showPrivacy"> 隐私政策</text>
+    </view>
+
+  </view>
+
+  <!-- 底部 -->
+  <view class="footer">
+    <text class="footer-text">用爱调味 · 用心做饭</text>
+  </view>
+
+</view>

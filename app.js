@@ -39,7 +39,10 @@ App({
       success: res => {
         if (res.result && res.result.success) {
           this.globalData.userInfo = res.result.userInfo
-          this.globalData.originalUserInfo = res.result.userInfo // 保存原始用户信息
+          this.globalData.originalUserInfo = res.result.userInfo
+          if (res.result.partnerInfo) {
+            this.globalData.partnerInfo = res.result.partnerInfo
+          }
           // 通知所有等待用户信息的页面
           if (this.userInfoReadyCallback) {
             this.userInfoReadyCallback(res.result.userInfo)
@@ -79,8 +82,10 @@ App({
         this.globalData.userInfo = res.result.userInfo
         this.globalData.originalUserInfo = res.result.userInfo
 
-        // 绑定关系变化时，清空伙伴缓存，避免展示旧状态
-        if (prevPartnerId !== (res.result.userInfo.partnerId || null)) {
+        // 绑定关系变化时更新伙伴缓存
+        if (res.result.partnerInfo !== undefined) {
+          this.globalData.partnerInfo = res.result.partnerInfo
+        } else if (prevPartnerId !== (res.result.userInfo.partnerId || null)) {
           this.globalData.partnerInfo = null
         }
 
@@ -103,19 +108,14 @@ App({
       return null
     }
 
+    // 已有缓存且 ID 匹配，直接返回
     if (this.globalData.partnerInfo && this.globalData.partnerInfo._id === userInfo.partnerId) {
       return this.globalData.partnerInfo
     }
 
-    try {
-      const db = wx.cloud.database()
-      const { data } = await db.collection('users').doc(userInfo.partnerId).get()
-      this.globalData.partnerInfo = data
-      return data
-    } catch (e) {
-      console.error('获取伙伴信息失败', e)
-      return null
-    }
+    // 通过 refreshUserInfo 触发云函数重新拉取（云函数内无权限限制）
+    await this.refreshUserInfo()
+    return this.globalData.partnerInfo || null
   },
 
   async getCoupleOpenIds() {
@@ -154,6 +154,9 @@ App({
       if (res.result && res.result.success) {
         this.globalData.userInfo = res.result.userInfo
         this.globalData.originalUserInfo = res.result.userInfo
+        if (res.result.partnerInfo !== undefined) {
+          this.globalData.partnerInfo = res.result.partnerInfo
+        }
         // 通知所有等待用户信息的页面
         if (this.userInfoReadyCallback) {
           this.userInfoReadyCallback(res.result.userInfo)

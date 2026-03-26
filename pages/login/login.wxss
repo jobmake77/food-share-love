@@ -120,15 +120,51 @@
 }
 
 /* ========== 用户协议 ========== */
-.privacy-tip {
-  font-size: 20rpx;
+.privacy-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+  width: 100%;
+}
+
+.checkbox {
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid var(--color-text-hint);
+  border-radius: 8rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rpx;
+  transition: all 0.15s ease;
+}
+
+.checkbox.checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.check-mark {
+  font-size: 22rpx;
+  color: #fff;
+  line-height: 1;
+}
+
+.privacy-text {
+  font-size: 22rpx;
   color: var(--color-text-hint);
-  text-align: center;
-  line-height: 1.8;
+  line-height: 1.7;
+  flex: 1;
 }
 
 .privacy-link {
   color: var(--color-primary);
+}
+
+.btn-disabled {
+  opacity: 0.45;
 }
 
 /* ========== 底部 ========== */

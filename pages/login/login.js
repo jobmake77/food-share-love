@@ -5,6 +5,7 @@ Page({
   data: {
     loading: false,
     isColdStart: false, // 是否是冷启动（静默登录场景）
+    agreed: false,
   },
 
   onLoad() {
@@ -29,6 +30,10 @@ Page({
 
   async handleLogin() {
     if (this.data.loading) return
+    if (!this.data.agreed) {
+      wx.showToast({ title: '请先阅读并同意用户协议', icon: 'none', duration: 2000 })
+      return
+    }
     wx.vibrateShort({ type: 'light' })
     this.setData({ loading: true })
 
@@ -61,6 +66,10 @@ Page({
       }
       wx.showToast({ title: '登录失败，请重试', icon: 'none' })
     }
+  },
+
+  toggleAgree() {
+    this.setData({ agreed: !this.data.agreed })
   },
 
   showPrivacy() {

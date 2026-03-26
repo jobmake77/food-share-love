@@ -24,9 +24,22 @@
       <text class="sub-title">记录每一次爱的味道 💕</text>
     </view>
 
+    <!-- 隐私协议勾选（审核要求：用户主动勾选） -->
+    <view class="privacy-row" bindtap="toggleAgree">
+      <view class="checkbox {{agreed ? 'checked' : ''}}">
+        <text wx:if="{{agreed}}" class="check-mark">✓</text>
+      </view>
+      <view class="privacy-text">
+        <text>我已阅读并同意</text>
+        <text class="privacy-link" catchtap="showPrivacy"> 《用户服务协议》 </text>
+        <text>及</text>
+        <text class="privacy-link" catchtap="showPrivacy"> 《隐私政策》</text>
+      </view>
+    </view>
+
     <!-- 微信登录按钮 -->
     <button
-      class="btn-wechat"
+      class="btn-wechat {{!agreed ? 'btn-disabled' : ''}}"
       bindtap="handleLogin"
       disabled="{{loading}}"
       loading="{{loading}}"
@@ -37,14 +50,6 @@
       </view>
       <text wx:else class="btn-text">登录中...</text>
     </button>
-
-    <!-- 用户协议 -->
-    <view class="privacy-tip">
-      <text>登录即表示同意</text>
-      <text class="privacy-link" bindtap="showPrivacy"> 用户协议 </text>
-      <text>和</text>
-      <text class="privacy-link" bindtap="showPrivacy"> 隐私政策</text>
-    </view>
 
   </view>
 

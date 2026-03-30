@@ -25,7 +25,7 @@
   </view>
 
   <view class="manage-hint" wx:if="{{categories.length === 0 || allDishes.length === 0}}">
-    <text class="manage-hint-text">还没有菜单内容？请到「我的 → 菜单管理」添加或导入官方菜单</text>
+    <text class="manage-hint-text">去「我的 → 菜单管理」添加分类和菜品，或导入官方菜单</text>
   </view>
 
   <!-- 双栏布局 -->
@@ -57,7 +57,10 @@
         wx:key="_id"
         style="animation-delay: {{index * 0.05}}s"
       >
-        <text class="dish-emoji">{{item.emoji || '🍽️'}}</text>
+        <view class="dish-media">
+          <image wx:if="{{item.image}}" class="dish-image" src="{{item.image}}" mode="aspectFill" />
+          <text wx:else class="dish-emoji">{{item.emoji || '🍽️'}}</text>
+        </view>
 
         <view class="dish-info">
           <text class="dish-name">{{item.name}}</text>

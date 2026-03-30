@@ -4,6 +4,16 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
 
+async function getUserById(userId) {
+  if (!userId) return null
+  try {
+    const { data } = await db.collection('users').doc(userId).get()
+    return data || null
+  } catch (error) {
+    return null
+  }
+}
+
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const myOpenid = wxContext.OPENID
@@ -27,21 +37,45 @@ exports.main = async (event, context) => {
 
     // 处理解绑请求
     if (action === 'unbind') {
-      if (!me.partnerId) {
-        return { success: false, error: '当前未绑定伙伴' }
+      let partner = await getUserById(me.partnerId)
+
+      if (!partner) {
+        const { data: reciprocalUsers } = await db.collection('users')
+          .where({ partnerId: me._id })
+          .limit(1)
+          .get()
+        partner = reciprocalUsers[0] || null
       }
 
-      const partnerId = me.partnerId
+      if (!me.partnerId && !partner) {
+        return {
+          success: true,
+          message: '当前已是未绑定状态',
+          userInfo: {
+            ...me,
+            partnerId: null
+          },
+          partnerInfo: null
+        }
+      }
+
       await db.collection('users').doc(me._id).update({
         data: { partnerId: null }
       })
 
-      await db.collection('users').doc(partnerId).update({
-        data: { partnerId: null }
-      })
+      if (partner && partner._id) {
+        await db.collection('users').doc(partner._id).update({
+          data: { partnerId: null }
+        })
+      }
 
       const { data: latestMe } = await db.collection('users').doc(me._id).get()
-      return { success: true, message: '已解绑', userInfo: latestMe }
+      return {
+        success: true,
+        message: '已解绑',
+        userInfo: latestMe,
+        partnerInfo: null
+      }
     }
 
     // 处理接受/拒绝绑定请求

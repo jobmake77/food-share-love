@@ -1,20 +1,45 @@
 // utils/avatar.js
 // 头像处理工具函数
 
-/**
- * 过滤错误的 avatar 值
- * 如果 avatar 是长字符串（可能是ID），返回默认 emoji
- * @param {String} avatar - 头像值
- * @param {String} defaultEmoji - 默认 emoji，默认为 '👨‍🍳'
- * @returns {String} 过滤后的头像值
- */
+function isImageSource(value) {
+  if (!value || typeof value !== 'string') return false
+  return /^(cloud:\/\/|https?:\/\/|wxfile:\/\/|data:image\/)/.test(value.trim())
+}
+
+function isEmojiLike(value) {
+  if (!value || typeof value !== 'string') return false
+  const text = value.trim()
+  if (!text || text.length > 8) return false
+  return !/^[a-zA-Z0-9_\-/.:%?#=&\s]+$/.test(text)
+}
+
+function resolveAvatar(avatar, defaultEmoji = '👨‍🍳') {
+  if (isImageSource(avatar)) {
+    return {
+      image: avatar,
+      emoji: defaultEmoji
+    }
+  }
+
+  if (isEmojiLike(avatar)) {
+    return {
+      image: '',
+      emoji: avatar.trim()
+    }
+  }
+
+  return {
+    image: '',
+    emoji: defaultEmoji
+  }
+}
+
 function filterAvatar(avatar, defaultEmoji = '👨‍🍳') {
-  if (!avatar) return defaultEmoji
-  // 如果是长字符串（可能是ID），使用默认emoji
-  if (avatar.length > 10) return defaultEmoji
-  return avatar
+  return resolveAvatar(avatar, defaultEmoji).emoji
 }
 
 module.exports = {
-  filterAvatar
+  filterAvatar,
+  isImageSource,
+  resolveAvatar
 }

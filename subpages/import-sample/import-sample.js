@@ -1,6 +1,5 @@
 // subpages/import-sample/import-sample.js
 const app = getApp()
-const { fetchAll } = require('../../utils/db.js')
 
 const OFFICIAL_MENU_PACKS = [
   {
@@ -217,39 +216,15 @@ Page({
         if (!res.confirm) return
 
         this.setData({ clearing: true })
-        const db = wx.cloud.database()
-        const _ = db.command
-
-        await app.waitForUserInfo()
-        await app.loadPartnerInfo()
-        const openids = await app.getCoupleOpenIds()
-        if (openids.length === 0) {
-          wx.showToast({ title: '未登录，无法清空', icon: 'none' })
-          this.setData({ clearing: false })
-          return
-        }
 
         try {
           wx.showLoading({ title: '清空中...' })
+          const { result } = await wx.cloud.callFunction({
+            name: 'clearMenuData'
+          })
 
-          // 1. 获取所有分类并删除
-          const categories = await fetchAll((skip, limit) => db.collection('categories')
-            .where({ _openid: _.in(openids) })
-            .skip(skip)
-            .limit(limit)
-            .get())
-          for (const cat of categories) {
-            await db.collection('categories').doc(cat._id).remove()
-          }
-
-          // 2. 获取所有菜品并删除
-          const dishes = await fetchAll((skip, limit) => db.collection('dishes')
-            .where({ _openid: _.in(openids) })
-            .skip(skip)
-            .limit(limit)
-            .get())
-          for (const dish of dishes) {
-            await db.collection('dishes').doc(dish._id).remove()
+          if (!result || !result.success) {
+            throw new Error(result?.error || '清空失败')
           }
 
           wx.hideLoading()
@@ -259,12 +234,17 @@ Page({
             duration: 2000
           })
 
-          console.log(`已删除 ${categories.length} 个分类和 ${dishes.length} 道菜品`)
+          console.log(`已删除 ${result.deletedCategories || 0} 个分类和 ${result.deletedDishes || 0} 道菜品`)
 
         } catch (e) {
           wx.hideLoading()
           console.error('清空失败', e)
-          wx.showToast({ title: '清空失败', icon: 'error' })
+          const message = (e && e.message) || ''
+          let title = '清空失败'
+          if (message.includes('permission')) title = '没有权限清空'
+          else if (message.includes('network')) title = '网络异常，请重试'
+          else if (message.includes('残留')) title = '仍有残留数据'
+          wx.showToast({ title, icon: 'none' })
         } finally {
           this.setData({ clearing: false })
         }

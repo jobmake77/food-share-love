@@ -1,5 +1,6 @@
 // subpages/settings/settings.js
 const app = getApp()
+const { resolveAvatar, isImageSource } = require('../../utils/avatar.js')
 
 Page({
   data: {
@@ -8,15 +9,21 @@ Page({
     nickname: '',
   },
 
-  onLoad() {
-    const userInfo = app.globalData.userInfo
-    if (userInfo) {
-      this.setData({
-        avatar: userInfo.avatar || '',
-        avatarEmoji: userInfo.avatarEmoji || '👨‍🍳',
-        nickname: userInfo.nickname || '',
-      })
-    }
+  async onLoad() {
+    await this.syncUserInfo()
+  },
+
+  async syncUserInfo() {
+    await app.refreshUserInfo()
+    const userInfo = await app.waitForUserInfo()
+    if (!userInfo) return
+
+    const avatarState = resolveAvatar(userInfo.avatar, '👨‍🍳')
+    this.setData({
+      avatar: avatarState.image || (isImageSource(userInfo.avatar) ? userInfo.avatar : ''),
+      avatarEmoji: avatarState.emoji,
+      nickname: userInfo.nickname || '',
+    })
   },
 
   chooseAvatar() {
@@ -61,8 +68,9 @@ Page({
     wx.vibrateShort({ type: 'medium' })
 
     const { avatar, nickname } = this.data
+    const trimmedNickname = nickname.trim()
 
-    if (!nickname || nickname.trim() === '') {
+    if (!nickname || trimmedNickname === '') {
       wx.showToast({ title: '请输入昵称', icon: 'none' })
       return
     }
@@ -70,30 +78,32 @@ Page({
     wx.showLoading({ title: '保存中...', mask: true })
 
     try {
-      const db = wx.cloud.database()
-      const userInfo = app.globalData.userInfo
+      const success = await app.updateUserInfo({
+        nickName: trimmedNickname,
+        avatarUrl: avatar
+      }, null)
 
-      // 更新数据库
-      await db.collection('users').doc(userInfo._id).update({
-        data: {
-          avatar,
-          nickname: nickname.trim(),
-        }
-      })
+      if (!success) {
+        throw new Error('资料更新失败')
+      }
 
-      // 更新全局数据
-      app.globalData.userInfo.avatar = avatar
-      app.globalData.userInfo.nickname = nickname.trim()
+      const nextUserInfo = {
+        ...(app.globalData.userInfo || {}),
+        nickname: trimmedNickname,
+        avatar
+      }
+      app.globalData.userInfo = nextUserInfo
+      app.globalData.originalUserInfo = nextUserInfo
 
       wx.hideLoading()
       wx.showToast({
         title: '保存成功',
         icon: 'success',
-        duration: 2000,
+        duration: 1200,
         success: () => {
           setTimeout(() => {
             wx.navigateBack()
-          }, 2000)
+          }, 1200)
         }
       })
     } catch (e) {

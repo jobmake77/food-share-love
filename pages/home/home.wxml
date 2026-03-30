@@ -11,16 +11,16 @@
         <view class="couple-avatars">
           <view class="avatar-wrapper">
             <view class="avatar-circle">
-              <image wx:if="{{userInfo.avatar}}" src="{{userInfo.avatar}}" class="avatar-img" mode="aspectFill" />
-              <text wx:else class="avatar-emoji">👨‍🍳</text>
+              <image wx:if="{{userAvatar}}" src="{{userAvatar}}" class="avatar-img" mode="aspectFill" />
+              <text wx:else class="avatar-emoji">{{userAvatarEmoji}}</text>
             </view>
             <view class="avatar-name-tag">{{userInfo.nickname || '小明'}}</view>
           </view>
           <view class="heart-icon">❤️</view>
           <view class="avatar-wrapper">
             <view class="avatar-circle">
-              <image wx:if="{{partnerInfo.avatar}}" src="{{partnerInfo.avatar}}" class="avatar-img" mode="aspectFill" />
-              <text wx:else class="avatar-emoji">👩‍🍳</text>
+              <image wx:if="{{partnerAvatar}}" src="{{partnerAvatar}}" class="avatar-img" mode="aspectFill" />
+              <text wx:else class="avatar-emoji">{{partnerAvatarEmoji}}</text>
             </view>
             <view class="avatar-name-tag">{{partnerInfo.nickname || '小美'}}</view>
           </view>

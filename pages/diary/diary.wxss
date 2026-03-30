@@ -251,6 +251,16 @@
   align-items: center;
   justify-content: center;
   font-size: 64rpx;
+  overflow: hidden;
+}
+
+.dish-image {
+  width: 100%;
+  height: 100%;
+}
+
+.dish-emoji {
+  font-size: 64rpx;
 }
 
 .more-images-btn {

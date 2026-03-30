@@ -3,7 +3,10 @@
   <!-- 个人资料卡片 -->
   <view class="profile-card">
     <view class="profile-header">
-      <view class="profile-avatar">{{myAvatar}}</view>
+      <view class="profile-avatar">
+        <image wx:if="{{myAvatar}}" class="avatar-image" src="{{myAvatar}}" mode="aspectFill" />
+        <text wx:else>{{myAvatarEmoji}}</text>
+      </view>
       <view class="profile-info">
         <text class="profile-name">{{myName}}</text>
         <text class="profile-status">
@@ -39,10 +42,13 @@
 
     <!-- 已绑定状态 -->
     <view class="partner-info" wx:if="{{isBound}}">
-      <view class="partner-avatar">{{partnerAvatar}}</view>
+      <view class="partner-avatar">
+        <image wx:if="{{partnerAvatar}}" class="avatar-image" src="{{partnerAvatar}}" mode="aspectFill" />
+        <text wx:else>{{partnerAvatarEmoji}}</text>
+      </view>
       <view class="partner-details">
         <text class="partner-name">{{partnerName}}</text>
-        <text class="partner-code">{{partnerCode}}</text>
+        <text class="partner-code">{{partnerCode || partnerStatusText}}</text>
       </view>
       <view class="unbind-btn" bindtap="unbindPartner">
         <text>解绑</text>

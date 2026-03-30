@@ -78,9 +78,10 @@
         <view
           class="dish-image-box"
           wx:for="{{expandedImages ? selectedEntry.images : selectedEntry.images.slice(0, 4)}}"
-          wx:key="*this"
+          wx:key="index"
         >
-          <text>{{item}}</text>
+          <image wx:if="{{item.type === 'image'}}" class="dish-image" src="{{item.value}}" mode="aspectFill" />
+          <text wx:else class="dish-emoji">{{item.value}}</text>
         </view>
         <view
           class="more-images-btn"

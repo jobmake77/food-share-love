@@ -73,13 +73,17 @@ Page({
       orders.forEach(order => {
         const date = new Date(order.createdAt)
         const dateKey = this.formatDateKey(date.getFullYear(), date.getMonth(), date.getDate())
+        const images = (order.dishes || []).map(d => ({
+          type: d.image ? 'image' : 'emoji',
+          value: d.image || d.emoji || '🍽️'
+        }))
 
         diaryEntries[dateKey] = {
           dishes: order.dishes.map(d => d.name),
           emoji: this.getRatingEmoji(order.rating),
           rating: order.rating || 0,
           chef: order.creatorName,
-          images: order.dishes.map(d => d.emoji || '🍽️'),
+          images,
           review: order.review || '',
           orderId: order._id
         }

@@ -1,11 +1,16 @@
 // pages/home/home.js
 const app = getApp()
 const { fetchAll } = require('../../utils/db.js')
+const { resolveAvatar } = require('../../utils/avatar.js')
 
 Page({
   data: {
     userInfo: null,
     partnerInfo: null,
+    userAvatar: '',
+    userAvatarEmoji: '👨‍🍳',
+    partnerAvatar: '',
+    partnerAvatarEmoji: '👩‍🍳',
     greeting: '',
     loaded: false,
     recommendDishes: [],
@@ -42,21 +47,34 @@ Page({
     const userInfo = await app.waitForUserInfo()
     if (!userInfo) return
 
-    this.setData({ userInfo, loaded: true })
+    const userAvatarState = resolveAvatar(userInfo.avatar, '👨‍🍳')
+
+    this.setData({
+      userInfo,
+      loaded: true,
+      userAvatar: userAvatarState.image,
+      userAvatarEmoji: userAvatarState.emoji
+    })
 
     // 加载伙伴信息
     const partnerInfo = await app.loadPartnerInfo()
-    if (partnerInfo) {
-      this.setData({ partnerInfo })
-    }
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatar, '👩‍🍳')
+    this.setData({
+      partnerInfo: partnerInfo || null,
+      partnerAvatar: partnerAvatarState.image,
+      partnerAvatarEmoji: partnerAvatarState.emoji
+    })
   },
 
   // 加载伙伴信息
   async _loadPartnerInfo() {
     const partnerInfo = await app.loadPartnerInfo()
-    if (partnerInfo) {
-      this.setData({ partnerInfo })
-    }
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatar, '👩‍🍳')
+    this.setData({
+      partnerInfo: partnerInfo || null,
+      partnerAvatar: partnerAvatarState.image,
+      partnerAvatarEmoji: partnerAvatarState.emoji
+    })
   },
 
   async loadStats() {

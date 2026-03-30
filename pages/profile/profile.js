@@ -1,7 +1,7 @@
 // pages/profile/profile.js
 const app = getApp()
 const { fetchAll } = require('../../utils/db.js')
-const { filterAvatar } = require('../../utils/avatar.js')
+const { resolveAvatar } = require('../../utils/avatar.js')
 
 Page({
   data: {
@@ -9,10 +9,13 @@ Page({
     copied: false,
     isBound: false,
     myName: '',
-    myAvatar: '👨‍🍳',
+    myAvatar: '',
+    myAvatarEmoji: '👨‍🍳',
     partnerName: '',
-    partnerAvatar: '👩‍🍳',
+    partnerAvatar: '',
+    partnerAvatarEmoji: '👩‍🍳',
     partnerCode: '',
+    partnerStatusText: '',
     daysCount: 0,
     bindCodeInput: '',
     binding: false,
@@ -51,16 +54,26 @@ Page({
     }
 
     const partnerInfo = await app.loadPartnerInfo()
+    const myAvatarState = resolveAvatar(userInfo.avatar, '👨‍🍳')
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatar, '👩‍🍳')
+    const hasPartner = !!userInfo.partnerId
+    const partnerName = partnerInfo ? (partnerInfo.nickname || '已绑定伙伴') : (hasPartner ? '已绑定伙伴' : '')
+    const partnerCode = partnerInfo && partnerInfo.code ? `LOVE-${partnerInfo.code}` : ''
 
     this.setData({
       myName: userInfo.nickname || '小明',
-      myAvatar: filterAvatar(userInfo.avatar, '👨‍🍳'),
+      myAvatar: myAvatarState.image,
+      myAvatarEmoji: myAvatarState.emoji,
       myCode: userInfo.code ? `LOVE-${userInfo.code}` : '',
-      isBound: !!userInfo.partnerId,
+      isBound: hasPartner,
       daysCount,
-      partnerName: partnerInfo ? (partnerInfo.nickname || '小美') : '',
-      partnerAvatar: filterAvatar(partnerInfo?.avatar, '👩‍🍳'),
-      partnerCode: partnerInfo && partnerInfo.code ? `LOVE-${partnerInfo.code}` : ''
+      partnerName,
+      partnerAvatar: partnerAvatarState.image,
+      partnerAvatarEmoji: partnerAvatarState.emoji,
+      partnerCode,
+      partnerStatusText: hasPartner
+        ? (partnerCode ? '已与 TA 成功绑定' : '已绑定，正在同步伙伴信息')
+        : ''
     })
   },
 
@@ -117,18 +130,18 @@ Page({
 
           wx.hideLoading()
           if (result.result && result.result.success) {
-            app.globalData.partnerInfo = null
             if (result.result.userInfo) {
-              app.globalData.userInfo = result.result.userInfo
-              app.globalData.originalUserInfo = result.result.userInfo
+              app.applyUserState(result.result.userInfo, result.result.partnerInfo, { forcePartnerSync: true })
             } else if (app.globalData.userInfo) {
               app.globalData.userInfo.partnerId = null
             }
             this.setData({
               isBound: false,
               partnerName: '',
-              partnerAvatar: '👩‍🍳',
-              partnerCode: ''
+              partnerAvatar: '',
+              partnerAvatarEmoji: '👩‍🍳',
+              partnerCode: '',
+              partnerStatusText: ''
             })
             this.loadBindRequests()
             wx.showToast({ title: result.result.message || '已解绑', icon: 'success' })
@@ -193,19 +206,10 @@ Page({
       wx.hideLoading()
 
       if (res.result && res.result.success) {
-        app.globalData.partnerInfo = res.result.partnerInfo || null
         if (res.result.userInfo) {
-          app.globalData.userInfo = res.result.userInfo
-          app.globalData.originalUserInfo = res.result.userInfo
-        } else if (app.globalData.userInfo) {
-          app.globalData.userInfo.partnerId = res.result.partnerInfo ? res.result.partnerInfo._id : null
+          app.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
         }
-        this.setData({
-          isBound: !!res.result.partnerInfo,
-          partnerName: res.result.partnerInfo ? (res.result.partnerInfo.nickname || '小美') : '',
-          partnerAvatar: filterAvatar(res.result.partnerInfo?.avatar, '👩‍🍳'),
-          partnerCode: res.result.partnerInfo && res.result.partnerInfo.code ? `LOVE-${res.result.partnerInfo.code}` : ''
-        })
+        await this.loadProfileData()
         this.loadBindRequests()
         wx.showToast({ title: res.result.message || '绑定成功', icon: 'success' })
       } else {
@@ -270,10 +274,7 @@ Page({
       confirmColor: '#ff4444',
       success: (res) => {
         if (res.confirm) {
-          app.globalData.userInfo = null
-          app.globalData.partnerInfo = null
-          app.globalData.originalUserInfo = null
-          app.userInfoReadyCallbacks = []
+          app.clearUserState()
           wx.reLaunch({ url: '/pages/login/login' })
         }
       }

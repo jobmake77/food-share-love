@@ -43,7 +43,10 @@
   <view class="dish-list">
     <view class="dish-item" wx:for="{{filteredDishes}}" wx:key="_id">
       <view class="dish-main" bindtap="editDish" data-id="{{item._id}}">
-        <view class="dish-emoji">{{item.emoji || '🍽️'}}</view>
+        <view class="dish-media">
+          <image wx:if="{{item.image}}" class="dish-image" src="{{item.image}}" mode="aspectFill" />
+          <view wx:else class="dish-emoji">{{item.emoji || '🍽️'}}</view>
+        </view>
         <view class="dish-info">
           <view class="dish-name">{{item.name}}</view>
           <view class="dish-desc">{{item.desc || '暂无简介'}}</view>

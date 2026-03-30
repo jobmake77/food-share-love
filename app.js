@@ -37,20 +37,8 @@ App({
     wx.cloud.callFunction({
       name: 'login',
       success: res => {
-        if (res.result && res.result.success) {
-          this.globalData.userInfo = res.result.userInfo
-          this.globalData.originalUserInfo = res.result.userInfo
-          if (res.result.partnerInfo) {
-            this.globalData.partnerInfo = res.result.partnerInfo
-          }
-          // 通知所有等待用户信息的页面
-          if (this.userInfoReadyCallback) {
-            this.userInfoReadyCallback(res.result.userInfo)
-          }
-          if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
-            this.userInfoReadyCallbacks.forEach(callback => callback(res.result.userInfo))
-            this.userInfoReadyCallbacks = []
-          }
+        if (res.result && res.result.success && res.result.userInfo) {
+          this.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
         }
       },
       fail: err => {
@@ -71,28 +59,53 @@ App({
     })
   },
 
+  notifyUserInfoReady(userInfo) {
+    if (this.userInfoReadyCallback) {
+      this.userInfoReadyCallback(userInfo)
+    }
+    if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
+      this.userInfoReadyCallbacks.forEach(callback => callback(userInfo))
+      this.userInfoReadyCallbacks = []
+    }
+  },
+
+  applyUserState(userInfo, partnerInfo, options = {}) {
+    const { forcePartnerSync = false } = options
+    const prevPartnerId = this.globalData.userInfo?.partnerId || null
+
+    this.globalData.userInfo = userInfo || null
+    this.globalData.originalUserInfo = userInfo || null
+
+    if (!userInfo || !userInfo.partnerId) {
+      this.globalData.partnerInfo = null
+    } else if (forcePartnerSync || partnerInfo !== undefined) {
+      this.globalData.partnerInfo = partnerInfo || null
+    } else if (prevPartnerId !== (userInfo.partnerId || null)) {
+      this.globalData.partnerInfo = null
+    }
+
+    if (userInfo) {
+      this.notifyUserInfoReady(userInfo)
+    }
+
+    return this.globalData.userInfo
+  },
+
+  clearUserState() {
+    this.globalData.userInfo = null
+    this.globalData.partnerInfo = null
+    this.globalData.originalUserInfo = null
+    this.userInfoReadyCallbacks = []
+  },
+
   async refreshUserInfo() {
     try {
-      const prevPartnerId = this.globalData.userInfo?.partnerId || null
       const res = await wx.cloud.callFunction({
         name: 'login'
       })
 
       if (res.result && res.result.success && res.result.userInfo) {
-        this.globalData.userInfo = res.result.userInfo
-        this.globalData.originalUserInfo = res.result.userInfo
-
-        // 绑定关系变化时更新伙伴缓存
-        if (res.result.partnerInfo !== undefined) {
-          this.globalData.partnerInfo = res.result.partnerInfo
-        } else if (prevPartnerId !== (res.result.userInfo.partnerId || null)) {
-          this.globalData.partnerInfo = null
-        }
-
-        if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
-          this.userInfoReadyCallbacks.forEach(callback => callback(res.result.userInfo))
-          this.userInfoReadyCallbacks = []
-        }
+        return this.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
       }
     } catch (err) {
       console.error('刷新用户信息失败', err)
@@ -151,20 +164,8 @@ App({
         data
       })
 
-      if (res.result && res.result.success) {
-        this.globalData.userInfo = res.result.userInfo
-        this.globalData.originalUserInfo = res.result.userInfo
-        if (res.result.partnerInfo !== undefined) {
-          this.globalData.partnerInfo = res.result.partnerInfo
-        }
-        // 通知所有等待用户信息的页面
-        if (this.userInfoReadyCallback) {
-          this.userInfoReadyCallback(res.result.userInfo)
-        }
-        if (this.userInfoReadyCallbacks && this.userInfoReadyCallbacks.length > 0) {
-          this.userInfoReadyCallbacks.forEach(callback => callback(res.result.userInfo))
-          this.userInfoReadyCallbacks = []
-        }
+      if (res.result && res.result.success && res.result.userInfo) {
+        this.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
         return true
       }
       return false

@@ -19,6 +19,7 @@ Page({
     await app.refreshUserInfo()
     await app.waitForUserInfo()
     await app.loadPartnerInfo()
+    this.syncCartFromApp()
     // 串行加载，确保分类先加载完成
     await this.loadCategories()
     await this.loadDishes()
@@ -107,6 +108,7 @@ Page({
 
   async onShow() {
     await app.refreshUserInfo()
+    this.syncCartFromApp()
     // 首次加载时跳过（onLoad 已经加载过了）
     if (this.data.isFirstLoad) {
       this.setData({ isFirstLoad: false })
@@ -121,6 +123,16 @@ Page({
       this.filterDishes()
     }
     this._checkTodayChef()
+  },
+
+  syncCartFromApp() {
+    const cartItems = app.getCartState()
+    const cart = {}
+    cartItems.forEach(item => {
+      cart[item.dishId] = item.count
+    })
+    const totalCount = cartItems.reduce((sum, item) => sum + item.count, 0)
+    this.setData({ cart, totalCount })
   },
 
   async _checkTodayChef() {
@@ -205,7 +217,7 @@ Page({
     this.setData({ cart, totalCount })
 
     // 同步到全局
-    app.globalData.cart = Object.entries(cart)
+    const cartItems = Object.entries(cart)
       .map(([dishId, count]) => {
         const dish = this.data.allDishes.find(d => d._id == dishId)
         if (!dish) return null
@@ -219,8 +231,7 @@ Page({
       })
       .filter(Boolean)
 
-    // 持久化到本地存储
-    wx.setStorageSync('cart', app.globalData.cart)
+    app.syncCartState(cartItems)
   },
 
   goCart() {

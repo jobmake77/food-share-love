@@ -13,31 +13,29 @@ Page({
   onShow() { this._syncCart() },
 
   _syncCart() {
-    const cart = app.globalData.cart || []
+    const cart = app.getCartState()
     const totalCount = cart.reduce((sum, i) => sum + i.count, 0)
     this.setData({ cart, totalCount })
   },
 
   increase(e) {
     const { id } = e.currentTarget.dataset
-    const cart = app.globalData.cart || []
+    const cart = [...app.getCartState()]
     const item = cart.find(i => i.dishId === id)
     if (item) item.count++
-    app.globalData.cart = cart
-    wx.setStorageSync('cart', cart)  // 持久化
+    app.syncCartState(cart)
     this._syncCart()
   },
 
   decrease(e) {
     const { id } = e.currentTarget.dataset
-    const cart = app.globalData.cart || []
+    const cart = [...app.getCartState()]
     const idx = cart.findIndex(i => i.dishId === id)
     if (idx >= 0) {
       cart[idx].count--
       if (cart[idx].count <= 0) cart.splice(idx, 1)
     }
-    app.globalData.cart = cart
-    wx.setStorageSync('cart', cart)  // 持久化
+    app.syncCartState(cart)
     this._syncCart()
   },
 
@@ -69,8 +67,8 @@ Page({
         createdAt: db.serverDate(),
       }
       const { _id } = await db.collection('orders').add({ data: orderData })
-      app.globalData.cart = []
-      wx.removeStorageSync('cart')  // 清除本地存储
+      app.clearCartState()
+      this._syncCart()
       wx.navigateTo({ url: `/subpages/order-success/order-success?orderId=${_id}&count=${cart.length}` })
     } catch (e) {
       wx.showToast({ title: '下单失败，请重试', icon: 'error' })

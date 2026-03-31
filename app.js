@@ -1,4 +1,6 @@
 // app.js
+const { isImageSource } = require('./utils/avatar.js')
+
 App({
   userInfoReadyCallbacks: [],
   onLaunch() {
@@ -16,7 +18,7 @@ App({
     }
 
     // 初始化全局数据，从本地存储恢复购物车
-    this.globalData.cart = wx.getStorageSync('cart') || []
+    this.syncCartState(wx.getStorageSync('cart') || [])
     this._login()
 
     // 性能监控
@@ -36,9 +38,9 @@ App({
     // 静默登录，只获取 openid
     wx.cloud.callFunction({
       name: 'login',
-      success: res => {
+      success: async res => {
         if (res.result && res.result.success && res.result.userInfo) {
-          this.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
+          await this.handleSessionResult(res.result.userInfo, res.result.partnerInfo)
         }
       },
       fail: err => {
@@ -69,6 +71,50 @@ App({
     }
   },
 
+  isCloudFileId(value) {
+    return typeof value === 'string' && value.startsWith('cloud://')
+  },
+
+  async resolveFileSource(src) {
+    if (!src || typeof src !== 'string') return ''
+    if (!this.isCloudFileId(src)) return isImageSource(src) ? src : ''
+
+    const cache = this.globalData.fileUrlCache || {}
+    if (cache[src]) return cache[src]
+
+    try {
+      const { fileList } = await wx.cloud.getTempFileURL({
+        fileList: [src]
+      })
+      const tempUrl = fileList && fileList[0] && fileList[0].tempFileURL
+      if (tempUrl) {
+        this.globalData.fileUrlCache[src] = tempUrl
+        return tempUrl
+      }
+    } catch (error) {
+      console.error('解析云文件地址失败', src, error)
+    }
+
+    return ''
+  },
+
+  async enrichUserProfile(profile) {
+    if (!profile) return null
+    const avatarDisplay = await this.resolveFileSource(profile.avatar)
+    return {
+      ...profile,
+      avatarDisplay: avatarDisplay || (isImageSource(profile.avatar) ? profile.avatar : '')
+    }
+  },
+
+  async handleSessionResult(userInfo, partnerInfo) {
+    const nextUserInfo = await this.enrichUserProfile(userInfo)
+    const nextPartnerInfo = partnerInfo === undefined
+      ? undefined
+      : await this.enrichUserProfile(partnerInfo)
+    return this.applyUserState(nextUserInfo, nextPartnerInfo, { forcePartnerSync: true })
+  },
+
   applyUserState(userInfo, partnerInfo, options = {}) {
     const { forcePartnerSync = false } = options
     const prevPartnerId = this.globalData.userInfo?.partnerId || null
@@ -91,11 +137,17 @@ App({
     return this.globalData.userInfo
   },
 
+  hasCompletedLogin(userInfo = this.globalData.userInfo) {
+    return !!(userInfo && userInfo._id && userInfo.phone)
+  },
+
   clearUserState() {
     this.globalData.userInfo = null
     this.globalData.partnerInfo = null
     this.globalData.originalUserInfo = null
     this.userInfoReadyCallbacks = []
+    this.globalData.fileUrlCache = {}
+    this.clearCartState()
   },
 
   async refreshUserInfo() {
@@ -105,7 +157,7 @@ App({
       })
 
       if (res.result && res.result.success && res.result.userInfo) {
-        return this.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
+        return await this.handleSessionResult(res.result.userInfo, res.result.partnerInfo)
       }
     } catch (err) {
       console.error('刷新用户信息失败', err)
@@ -165,7 +217,7 @@ App({
       })
 
       if (res.result && res.result.success && res.result.userInfo) {
-        this.applyUserState(res.result.userInfo, res.result.partnerInfo, { forcePartnerSync: true })
+        await this.handleSessionResult(res.result.userInfo, res.result.partnerInfo)
         return true
       }
       return false
@@ -209,11 +261,31 @@ App({
     return this.globalData.partnerInfo
   },
 
+  getCartState() {
+    const cart = wx.getStorageSync('cart') || this.globalData.cart || []
+    this.globalData.cart = Array.isArray(cart) ? cart : []
+    return this.globalData.cart
+  },
+
+  syncCartState(cartItems = []) {
+    const nextCart = Array.isArray(cartItems) ? cartItems : []
+    this.globalData.cart = nextCart
+    wx.setStorageSync('cart', nextCart)
+    return nextCart
+  },
+
+  clearCartState() {
+    this.globalData.cart = []
+    wx.removeStorageSync('cart')
+    return []
+  },
+
   globalData: {
     userInfo: null,
     partnerInfo: null,
     originalUserInfo: null, // 保存原始用户信息
     cart: [],
+    fileUrlCache: {},
     isTestMode: false, // 测试模式标记
     currentRole: 'self', // 当前角色：'self' 或 'partner'
   }

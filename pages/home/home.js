@@ -47,7 +47,7 @@ Page({
     const userInfo = await app.waitForUserInfo()
     if (!userInfo) return
 
-    const userAvatarState = resolveAvatar(userInfo.avatar, '👨‍🍳')
+    const userAvatarState = resolveAvatar(userInfo.avatarDisplay || userInfo.avatar, '👨‍🍳')
 
     this.setData({
       userInfo,
@@ -58,7 +58,7 @@ Page({
 
     // 加载伙伴信息
     const partnerInfo = await app.loadPartnerInfo()
-    const partnerAvatarState = resolveAvatar(partnerInfo?.avatar, '👩‍🍳')
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatarDisplay || partnerInfo?.avatar, '👩‍🍳')
     this.setData({
       partnerInfo: partnerInfo || null,
       partnerAvatar: partnerAvatarState.image,
@@ -69,7 +69,7 @@ Page({
   // 加载伙伴信息
   async _loadPartnerInfo() {
     const partnerInfo = await app.loadPartnerInfo()
-    const partnerAvatarState = resolveAvatar(partnerInfo?.avatar, '👩‍🍳')
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatarDisplay || partnerInfo?.avatar, '👩‍🍳')
     this.setData({
       partnerInfo: partnerInfo || null,
       partnerAvatar: partnerAvatarState.image,

@@ -1,31 +1,53 @@
-// pages/login/login.js
 const app = getApp()
 
 Page({
   data: {
     loading: false,
-    isColdStart: false, // 是否是冷启动（静默登录场景）
+    isColdStart: false,
     agreed: false,
+    loginStep: 'profile',
+    pendingUserProfile: null,
+    phoneRequiredNotice: '',
   },
 
   onLoad() {
-    // 已登录直接跳首页
-    if (app.globalData.userInfo) {
+    if (app.hasCompletedLogin()) {
       this._goHome()
       return
     }
-    // 冷启动：_login() 正在后台执行，等它完成后自动跳转
+
     this.setData({ isColdStart: true })
     app.waitForUserInfo().then(userInfo => {
-      if (userInfo) this._goHome()
+      this._syncLoginStep(userInfo)
+      if (app.hasCompletedLogin(userInfo)) {
+        this._goHome()
+      }
     })
   },
 
   onShow() {
-    // reLaunch 到登录页（退出场景）：userInfo 已清空，直接展示，不做任何跳转
-    if (app.globalData.userInfo) {
+    const userInfo = app.globalData.userInfo
+    this._syncLoginStep(userInfo)
+
+    if (app.hasCompletedLogin(userInfo)) {
       this._goHome()
     }
+  },
+
+  _syncLoginStep(userInfo) {
+    if (userInfo && !userInfo.phone) {
+      this.setData({
+        loginStep: 'phone',
+        pendingUserProfile: null,
+        phoneRequiredNotice: '还差一步，需完成手机号授权后才能进入小程序。'
+      })
+      return
+    }
+
+    this.setData({
+      loginStep: 'profile',
+      phoneRequiredNotice: ''
+    })
   },
 
   async handleLogin() {
@@ -34,6 +56,7 @@ Page({
       wx.showToast({ title: '请先阅读并同意用户协议', icon: 'none', duration: 2000 })
       return
     }
+
     wx.vibrateShort({ type: 'light' })
     this.setData({ loading: true })
 
@@ -42,21 +65,13 @@ Page({
         desc: '用于完善你的个人资料'
       })
 
-      wx.showLoading({ title: '登录中...', mask: true })
-
-      const success = await app.updateUserInfo(wxUserInfo, null)
-
-      wx.hideLoading()
-
-      if (success) {
-        wx.vibrateShort({ type: 'medium' })
-        this._goHome()
-      } else {
-        wx.showToast({ title: '登录失败，请重试', icon: 'none' })
-        this.setData({ loading: false })
-      }
+      this.setData({
+        loading: false,
+        loginStep: 'phone',
+        pendingUserProfile: wxUserInfo,
+        phoneRequiredNotice: '请授权当前微信绑定的手机号，完成账号登录。'
+      })
     } catch (err) {
-      wx.hideLoading()
       this.setData({ loading: false })
 
       if (err.errMsg && err.errMsg.includes('cancel')) return
@@ -68,6 +83,40 @@ Page({
     }
   },
 
+  async handleGetPhoneNumber(e) {
+    if (this.data.loading || !this.data.agreed) return
+
+    const { code, errMsg } = e.detail || {}
+    if (errMsg !== 'getPhoneNumber:ok' || !code) {
+      if (errMsg && errMsg.includes('deny')) {
+        wx.showToast({ title: '需授权手机号后才能继续', icon: 'none' })
+      } else {
+        wx.showToast({ title: '手机号授权失败，请重试', icon: 'none' })
+      }
+      return
+    }
+
+    this.setData({ loading: true })
+    wx.showLoading({ title: '登录中...', mask: true })
+
+    try {
+      const success = await app.updateUserInfo(this.data.pendingUserProfile, code)
+      wx.hideLoading()
+
+      if (success && app.hasCompletedLogin()) {
+        wx.vibrateShort({ type: 'medium' })
+        this._goHome()
+      } else {
+        wx.showToast({ title: '手机号授权失败，请重试', icon: 'none' })
+        this.setData({ loading: false })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      this.setData({ loading: false })
+      wx.showToast({ title: '登录失败，请重试', icon: 'none' })
+    }
+  },
+
   toggleAgree() {
     this.setData({ agreed: !this.data.agreed })
   },
@@ -75,7 +124,7 @@ Page({
   showPrivacy() {
     wx.showModal({
       title: '用户协议与隐私政策',
-      content: '本应用仅收集必要的微信账号信息（昵称、头像）用于个人身份识别，不会泄露给第三方。',
+      content: '本应用仅收集必要的微信账号信息（昵称、头像、手机号）用于情侣身份识别与账号找回，不会泄露给第三方。',
       showCancel: false,
       confirmText: '知道了'
     })

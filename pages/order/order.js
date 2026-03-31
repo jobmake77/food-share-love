@@ -18,10 +18,7 @@ Page({
   },
 
   onShow() {
-    // 从其他页面返回时刷新订单列表
-    if (this.data.orders.length > 0) {
-      this.loadOrders()
-    }
+    this.loadOrders()
   },
 
   async loadOrders() {
@@ -30,6 +27,7 @@ Page({
       const db = wx.cloud.database()
       const _ = db.command
 
+      await app.refreshUserInfo()
       await app.waitForUserInfo()
       await app.loadPartnerInfo()
 

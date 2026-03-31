@@ -54,8 +54,8 @@ Page({
     }
 
     const partnerInfo = await app.loadPartnerInfo()
-    const myAvatarState = resolveAvatar(userInfo.avatar, '👨‍🍳')
-    const partnerAvatarState = resolveAvatar(partnerInfo?.avatar, '👩‍🍳')
+    const myAvatarState = resolveAvatar(userInfo.avatarDisplay || userInfo.avatar, '👨‍🍳')
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatarDisplay || partnerInfo?.avatar, '👩‍🍳')
     const hasPartner = !!userInfo.partnerId
     const partnerName = partnerInfo ? (partnerInfo.nickname || '已绑定伙伴') : (hasPartner ? '已绑定伙伴' : '')
     const partnerCode = partnerInfo && partnerInfo.code ? `LOVE-${partnerInfo.code}` : ''

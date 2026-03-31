@@ -1,30 +1,28 @@
-<!-- pages/login/login.wxml -->
 <view class="login-container">
 
-  <!-- 顶部品牌标识 -->
   <view class="top-bar animate-fade-in-up">
     <text class="heart-icon animate-pulse-heart">♥</text>
     <text class="brand-text">FOOD SHARE LOVE</text>
     <text class="heart-icon animate-pulse-heart delay-200">♥</text>
   </view>
 
-  <!-- 中间主内容区 -->
   <view class="main-area">
-
-    <!-- 插图 -->
     <image
       class="illustration animate-float"
       src="/assets/login-illustration.png"
       mode="aspectFit"
     />
 
-    <!-- 标题 -->
     <view class="title-section">
       <text class="main-title">今天想吃什么？</text>
       <text class="sub-title">记录每一次爱的味道 💕</text>
     </view>
 
-    <!-- 隐私协议勾选（审核要求：用户主动勾选） -->
+    <view class="login-step-card" wx:if="{{phoneRequiredNotice}}">
+      <text class="login-step-title">{{loginStep === 'phone' ? '确认手机号' : '微信授权'}}</text>
+      <text class="login-step-desc">{{phoneRequiredNotice}}</text>
+    </view>
+
     <view class="privacy-row" bindtap="toggleAgree">
       <view class="checkbox {{agreed ? 'checked' : ''}}">
         <text wx:if="{{agreed}}" class="check-mark">✓</text>
@@ -37,23 +35,30 @@
       </view>
     </view>
 
-    <!-- 微信登录按钮 -->
     <button
+      wx:if="{{loginStep === 'profile'}}"
       class="btn-wechat {{!agreed ? 'btn-disabled' : ''}}"
       bindtap="handleLogin"
-      disabled="{{loading}}"
+      disabled="{{loading || !agreed}}"
       loading="{{loading}}"
     >
-      <view wx:if="{{!loading}}" class="btn-inner">
-        <image class="wechat-icon" src="/assets/icons/wechat.png" mode="aspectFit" />
-        <text class="btn-text">微信登录</text>
-      </view>
-      <text wx:else class="btn-text">登录中...</text>
+      <image wx:if="{{!loading}}" class="wechat-icon" src="/assets/icons/wechat.png" mode="aspectFit" />
+      <text class="btn-text">{{loading ? '处理中...' : '微信授权头像昵称'}}</text>
     </button>
 
+    <button
+      wx:if="{{loginStep === 'phone'}}"
+      class="btn-phone {{!agreed ? 'btn-disabled' : ''}}"
+      open-type="getPhoneNumber"
+      bindgetphonenumber="handleGetPhoneNumber"
+      disabled="{{loading || !agreed}}"
+      loading="{{loading}}"
+    >
+      <text wx:if="{{!loading}}" class="phone-icon">📱</text>
+      <text class="btn-text">{{loading ? '登录中...' : '点击授权当前微信手机号'}}</text>
+    </button>
   </view>
 
-  <!-- 底部 -->
   <view class="footer">
     <text class="footer-text">用爱调味 · 用心做饭</text>
   </view>

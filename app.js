@@ -131,6 +131,7 @@ App({
     }
 
     if (userInfo) {
+      this.globalData.manualLogout = false
       this.notifyUserInfoReady(userInfo)
     }
 
@@ -138,7 +139,7 @@ App({
   },
 
   hasCompletedLogin(userInfo = this.globalData.userInfo) {
-    return !!(userInfo && userInfo._id && userInfo.phone)
+    return !!(userInfo && userInfo._id)
   },
 
   clearUserState() {
@@ -147,6 +148,7 @@ App({
     this.globalData.originalUserInfo = null
     this.userInfoReadyCallbacks = []
     this.globalData.fileUrlCache = {}
+    this.globalData.manualLogout = true
     this.clearCartState()
   },
 
@@ -286,6 +288,7 @@ App({
     originalUserInfo: null, // 保存原始用户信息
     cart: [],
     fileUrlCache: {},
+    manualLogout: false,
     isTestMode: false, // 测试模式标记
     currentRole: 'self', // 当前角色：'self' 或 'partner'
   }

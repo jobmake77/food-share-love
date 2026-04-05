@@ -92,61 +92,33 @@
   color: var(--color-text-secondary);
 }
 
-.btn-wechat,
-.btn-phone {
+.btn-enter {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 28rpx 0;
   border-radius: var(--radius-btn);
+  background: var(--gradient-warm);
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
   border: none;
+  box-shadow: var(--shadow-warm);
   transition: all 0.2s ease;
   margin-bottom: 32rpx;
 }
 
-.btn-wechat {
-  background: #07C160;
-  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.35);
-}
-
-.btn-phone {
-  background: var(--gradient-warm);
-  box-shadow: var(--shadow-warm);
-}
-
-.btn-wechat::after,
-.btn-phone::after {
+.btn-enter::after {
   border: none;
 }
 
-.btn-wechat:active,
-.btn-phone:active {
+.btn-enter:active {
   transform: scale(0.97);
 }
 
-.btn-wechat[disabled],
-.btn-phone[disabled] {
+.btn-enter[disabled] {
   opacity: 0.65;
-}
-
-.btn-inner {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.wechat-icon {
-  width: 52rpx;
-  height: 52rpx;
-}
-
-.phone-icon {
-  font-size: 36rpx;
-  line-height: 1;
 }
 
 .btn-text {

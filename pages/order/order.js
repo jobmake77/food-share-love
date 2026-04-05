@@ -1,6 +1,7 @@
 // pages/order/order.js
 const app = getApp()
 const { fetchAll } = require('../../utils/db.js')
+const POLL_INTERVAL = 8000
 
 Page({
   data: {
@@ -13,16 +14,41 @@ Page({
     tempReview: '',
   },
 
+  pollTimer: null,
+
   onLoad() {
     this.loadOrders()
   },
 
   onShow() {
     this.loadOrders()
+    this.startPolling()
   },
 
-  async loadOrders() {
-    wx.showLoading({ title: '加载中...' })
+  onHide() {
+    this.stopPolling()
+  },
+
+  onUnload() {
+    this.stopPolling()
+  },
+
+  startPolling() {
+    this.stopPolling()
+    this.pollTimer = setInterval(() => {
+      this.loadOrders(true)
+    }, POLL_INTERVAL)
+  },
+
+  stopPolling() {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer)
+      this.pollTimer = null
+    }
+  },
+
+  async loadOrders(silent = false) {
+    if (!silent) wx.showLoading({ title: '加载中...' })
     try {
       const db = wx.cloud.database()
       const _ = db.command
@@ -63,9 +89,9 @@ Page({
       this.filterOrders()
     } catch (e) {
       console.error('加载订单失败:', e)
-      wx.showToast({ title: '加载失败', icon: 'none' })
+      if (!silent) wx.showToast({ title: '加载失败', icon: 'none' })
     } finally {
-      wx.hideLoading()
+      if (!silent) wx.hideLoading()
     }
   },
 
@@ -132,6 +158,7 @@ Page({
         )
         this.setData({ orders })
         this.filterOrders()
+        this.loadOrders(true)
 
         wx.showToast({ title: '已完成！', icon: 'success' })
       } catch (e) {
@@ -199,6 +226,7 @@ Page({
         showRatingModal: false,
       }, () => {
         this.filterOrders()
+        this.loadOrders(true)
         wx.showToast({ title: '评价成功', icon: 'success' })
       })
     } catch (e) {

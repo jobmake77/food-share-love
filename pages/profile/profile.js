@@ -2,6 +2,7 @@
 const app = getApp()
 const { fetchAll } = require('../../utils/db.js')
 const { resolveAvatar } = require('../../utils/avatar.js')
+const POLL_INTERVAL = 8000
 
 Page({
   data: {
@@ -32,6 +33,8 @@ Page({
     ],
   },
 
+  profilePollTimer: null,
+
   onLoad() {
     this.loadProfileData()
   },
@@ -39,9 +42,32 @@ Page({
   onShow() {
     this.loadProfileData()
     this.loadBindRequests()
+    this.startProfilePolling()
   },
 
-  async loadProfileData() {
+  onHide() {
+    this.stopProfilePolling()
+  },
+
+  onUnload() {
+    this.stopProfilePolling()
+  },
+
+  startProfilePolling() {
+    this.stopProfilePolling()
+    this.profilePollTimer = setInterval(() => {
+      this.loadProfileData(true)
+    }, POLL_INTERVAL)
+  },
+
+  stopProfilePolling() {
+    if (this.profilePollTimer) {
+      clearInterval(this.profilePollTimer)
+      this.profilePollTimer = null
+    }
+  },
+
+  async loadProfileData(silent = false) {
     await app.refreshUserInfo()
     const userInfo = await app.waitForUserInfo()
     if (!userInfo) return
@@ -54,8 +80,8 @@ Page({
     }
 
     const partnerInfo = await app.loadPartnerInfo()
-    const myAvatarState = resolveAvatar(userInfo.avatarDisplay || userInfo.avatar, '👨‍🍳')
-    const partnerAvatarState = resolveAvatar(partnerInfo?.avatarDisplay || partnerInfo?.avatar, '👩‍🍳')
+    const myAvatarState = resolveAvatar(userInfo.avatarDisplay, '👨‍🍳')
+    const partnerAvatarState = resolveAvatar(partnerInfo?.avatarDisplay, '👩‍🍳')
     const hasPartner = !!userInfo.partnerId
     const partnerName = partnerInfo ? (partnerInfo.nickname || '已绑定伙伴') : (hasPartner ? '已绑定伙伴' : '')
     const partnerCode = partnerInfo && partnerInfo.code ? `LOVE-${partnerInfo.code}` : ''

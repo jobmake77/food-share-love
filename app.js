@@ -103,7 +103,7 @@ App({
     const avatarDisplay = await this.resolveFileSource(profile.avatar)
     return {
       ...profile,
-      avatarDisplay: avatarDisplay || (isImageSource(profile.avatar) ? profile.avatar : '')
+      avatarDisplay: avatarDisplay || (!this.isCloudFileId(profile.avatar) && isImageSource(profile.avatar) ? profile.avatar : '')
     }
   },
 
@@ -177,6 +177,9 @@ App({
 
     // 已有缓存且 ID 匹配，直接返回
     if (this.globalData.partnerInfo && this.globalData.partnerInfo._id === userInfo.partnerId) {
+      if (!this.globalData.partnerInfo.avatarDisplay && this.globalData.partnerInfo.avatar) {
+        this.globalData.partnerInfo = await this.enrichUserProfile(this.globalData.partnerInfo)
+      }
       return this.globalData.partnerInfo
     }
 

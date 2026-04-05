@@ -4,20 +4,6 @@ Page({
   data: {
     loading: false,
     agreed: false,
-    canAutoEnter: true,
-  },
-
-  onLoad() {
-    this.syncEntryState()
-  },
-
-  onShow() {
-    this.syncEntryState()
-  },
-
-  syncEntryState() {
-    const canAutoEnter = !app.globalData.manualLogout
-    this.setData({ canAutoEnter })
   },
 
   async enterMiniProgram() {

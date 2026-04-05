@@ -103,12 +103,6 @@
     </view>
   </view>
 
-  <!-- 爱的寄语 -->
-  <view class="love-note">
-    <text class="love-icon">❤️</text>
-    <text class="love-text">"最好的爱情，是你做饭来我洗碗"</text>
-  </view>
-
   <!-- 退出登录 -->
   <view class="logout-btn" bindtap="logout">
     <text class="logout-icon">🚪</text>

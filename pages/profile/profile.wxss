@@ -365,30 +365,6 @@
   color: var(--color-text-hint);
 }
 
-/* ========== 爱的寄语 ========== */
-.love-note {
-  background: var(--gradient-soft);
-  border-radius: var(--radius-lg);
-  padding: 32rpx;
-  box-shadow: var(--shadow-card);
-  text-align: center;
-  margin-bottom: 32rpx;
-  animation: fadeInUp 0.6s ease-out 0.3s forwards;
-  opacity: 0;
-}
-
-.love-icon {
-  font-size: 40rpx;
-  margin-bottom: 16rpx;
-  animation: pulseHeart 1.5s ease-in-out infinite;
-}
-
-.love-text {
-  font-size: 20rpx;
-  color: var(--color-text-hint);
-  line-height: 1.6;
-}
-
 /* ========== 退出登录 ========== */
 .logout-btn {
   width: 100%;

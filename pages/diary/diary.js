@@ -1,6 +1,7 @@
 // pages/diary/diary.js
 const app = getApp()
 const { fetchAll } = require('../../utils/db.js')
+const POLL_INTERVAL = 8000
 
 const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
 const weekDays = ['日', '一', '二', '三', '四', '五', '六']
@@ -21,6 +22,8 @@ Page({
     diaryEntries: {},  // 从数据库加载的日记数据
   },
 
+  pollTimer: null,
+
   onLoad() {
     // 设置默认选中今天
     const today = new Date()
@@ -35,10 +38,33 @@ Page({
   onShow() {
     // 每次显示时刷新数据
     this.loadDiaryData()
+    this.startPolling()
   },
 
-  async loadDiaryData() {
-    wx.showLoading({ title: '加载中...' })
+  onHide() {
+    this.stopPolling()
+  },
+
+  onUnload() {
+    this.stopPolling()
+  },
+
+  startPolling() {
+    this.stopPolling()
+    this.pollTimer = setInterval(() => {
+      this.loadDiaryData(true)
+    }, POLL_INTERVAL)
+  },
+
+  stopPolling() {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer)
+      this.pollTimer = null
+    }
+  },
+
+  async loadDiaryData(silent = false) {
+    if (!silent) wx.showLoading({ title: '加载中...' })
     try {
       const db = wx.cloud.database()
       const _ = db.command
@@ -102,9 +128,9 @@ Page({
       this.loadSelectedEntry()
     } catch (e) {
       console.error('加载日记数据失败', e)
-      wx.showToast({ title: '加载失败', icon: 'none' })
+      if (!silent) wx.showToast({ title: '加载失败', icon: 'none' })
     } finally {
-      wx.hideLoading()
+      if (!silent) wx.hideLoading()
     }
   },
 

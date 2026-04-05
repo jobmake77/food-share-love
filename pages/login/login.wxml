@@ -15,14 +15,7 @@
 
     <view class="title-section">
       <text class="main-title">今天想吃什么？</text>
-      <text class="sub-title">基于当前微信身份直接进入，开始记录每一次爱的味道。</text>
-    </view>
-
-    <view class="login-step-card">
-      <text class="login-step-title">{{canAutoEnter ? '使用当前微信进入' : '使用当前微信重新进入'}}</text>
-      <text class="login-step-desc">
-        {{canAutoEnter ? '系统会基于当前微信账号识别你的身份，无需手机号即可进入并使用绑定、菜单、订单等功能。' : '退出后不会自动进入，请确认当前微信账号无误后继续。'}}
-      </text>
+      <text class="sub-title">记录每一次爱的味道 💕</text>
     </view>
 
     <view class="privacy-row" bindtap="toggleAgree">
@@ -43,7 +36,7 @@
       disabled="{{loading || !agreed}}"
       loading="{{loading}}"
     >
-      <text class="btn-text">{{loading ? '进入中...' : '使用当前微信进入'}}</text>
+      <text class="btn-text">{{loading ? '进入中...' : '微信登录'}}</text>
     </button>
   </view>
 
